@@ -94,6 +94,8 @@ body { font-family: 'Inter', sans-serif; background: var(--gray-50); color: var(
 .logo-text { font-family: 'Playfair Display', serif; }
 .logo-title { font-size: 16px; color: var(--gold); letter-spacing: 1px; line-height: 1; }
 .logo-sub { font-size: 9px; color: rgba(201,168,76,0.6); letter-spacing: 3px; text-transform: uppercase; }
+.mvp-badge { display: inline-block; margin-top: 5px; font-size: 9px; font-weight: 700; letter-spacing: 1px; background: linear-gradient(90deg, var(--gold), var(--gold-light)); color: var(--navy); padding: 2px 7px; border-radius: 20px; text-transform: uppercase; }
+.sidebar.collapsed .mvp-badge { display: none; }
 .sidebar.collapsed .logo-text { display: none; }
 
 .nav-section { padding: 12px 8px 4px; }
@@ -428,8 +430,9 @@ body { font-family: 'Inter', sans-serif; background: var(--gray-50); color: var(
 .dark .tab.active { background: var(--navy-mid); color: var(--gold-light); }
 
 /* PAGE */
-.page { display: none; }
+.page { display: none; opacity: 0; transform: translateY(8px); transition: opacity 0.25s ease, transform 0.25s ease; }
 .page.active { display: block; }
+.page.visible { opacity: 1; transform: translateY(0); }
 
 /* NOTIFY DOT */
 .notify-dot {
@@ -463,6 +466,22 @@ body { font-family: 'Inter', sans-serif; background: var(--gray-50); color: var(
 .mobile-nav-item.active { color: var(--gold); }
 .mobile-nav-item svg { width: 22px; height: 22px; }
 .mobile-nav-item span { font-size: 10px; font-weight: 500; }
+
+/* REUSABLE MODAL + TOAST (new, additive components) */
+.modal-overlay { display:none; position:fixed; inset:0; background:rgba(13,27,62,0.55); z-index:1000; align-items:center; justify-content:center; padding:20px; }
+.modal-overlay.open { display:flex; }
+.modal-box { background:var(--white); border-radius:var(--radius-lg); max-width:420px; width:100%; max-height:80vh; overflow-y:auto; box-shadow:var(--shadow-lg); padding:24px; }
+.modal-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; gap:12px; }
+.modal-title { font-size:16px; font-weight:700; color:var(--navy); font-family:'Playfair Display',serif; }
+.dark .modal-title { color:var(--gold-light); }
+.modal-close { cursor:pointer; color:var(--gray-400); font-size:16px; line-height:1; padding:4px; flex-shrink:0; }
+.modal-close:hover { color:var(--navy); }
+.modal-body { font-size:13px; color:var(--gray-600); line-height:1.6; }
+.modal-btn { margin-top:16px; padding:9px 18px; border-radius:8px; border:none; background:var(--gold); color:var(--navy); font-size:13px; font-weight:700; cursor:pointer; }
+.modal-btn:hover { background:var(--gold-light); }
+.toast { position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(20px); background:var(--navy); color:var(--white); padding:12px 22px; border-radius:8px; font-size:13px; font-weight:600; box-shadow:var(--shadow-lg); z-index:1100; opacity:0; pointer-events:none; transition:opacity 0.25s, transform 0.25s; }
+.toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+.milestone-card, .consult-card { cursor:pointer; }
 
 /* RESPONSIVE */
 @media (max-width: 1024px) {
@@ -540,65 +559,66 @@ body { font-family: 'Inter', sans-serif; background: var(--gray-50); color: var(
     <div class="logo-text">
       <div class="logo-title">HUDITA</div>
       <div class="logo-sub">by MAFIRA</div>
+      <div class="mvp-badge">HUDITA MVP v0.1</div>
     </div>
   </div>
 
   <div class="nav-section">
-    <div class="nav-label">Overview</div>
+    <div class="nav-label" data-i18n="nav.overview">Overview</div>
     <div class="nav-item active" onclick="navigate('dashboard',this)">
       <svg class="nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
-      <span class="nav-text">Dashboard</span>
+      <span class="nav-text" data-i18n="nav.dashboard">Dashboard</span>
     </div>
     <div class="nav-item" onclick="navigate('blueprint',this)">
       <svg class="nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-      <span class="nav-text">Blueprint</span>
+      <span class="nav-text" data-i18n="nav.blueprint">Blueprint</span>
       <span class="badge">6</span>
     </div>
   </div>
 
   <div class="nav-section">
-    <div class="nav-label">Resources</div>
+    <div class="nav-label" data-i18n="nav.resources">Resources</div>
     <div class="nav-item" onclick="navigate('knowledge',this)">
       <svg class="nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
-      <span class="nav-text">Knowledge Base</span>
+      <span class="nav-text" data-i18n="nav.knowledge">Knowledge Base</span>
     </div>
     <div class="nav-item" onclick="navigate('templates',this)">
       <svg class="nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
-      <span class="nav-text">Templates</span>
+      <span class="nav-text" data-i18n="nav.templates">Templates</span>
       <span class="badge">24</span>
     </div>
     <div class="nav-item" onclick="navigate('vendor',this)">
       <svg class="nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
-      <span class="nav-text">Vendor Directory</span>
+      <span class="nav-text" data-i18n="nav.vendor">Vendor Directory</span>
     </div>
   </div>
 
   <div class="nav-section">
-    <div class="nav-label">Community</div>
+    <div class="nav-label" data-i18n="nav.community">Community</div>
     <div class="nav-item" onclick="navigate('community',this)" style="position:relative">
       <svg class="nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-      <span class="nav-text">Community</span>
+      <span class="nav-text" data-i18n="nav.community">Community</span>
       <div class="notify-dot"></div>
     </div>
     <div class="nav-item" onclick="navigate('consultation',this)">
       <svg class="nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-      <span class="nav-text">Consultation</span>
+      <span class="nav-text" data-i18n="nav.consultation">Consultation</span>
     </div>
   </div>
 
   <div class="nav-section">
-    <div class="nav-label">Account</div>
+    <div class="nav-label" data-i18n="nav.account">Account</div>
     <div class="nav-item" onclick="navigate('settings',this)">
       <svg class="nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-      <span class="nav-text">Settings</span>
+      <span class="nav-text" data-i18n="nav.settings">Settings</span>
     </div>
   </div>
 
   <div class="sidebar-footer">
     <div class="user-card">
-      <div class="avatar">AU</div>
+      <div class="avatar">MD</div>
       <div class="user-info">
-        <div class="name">Al-Amin Tour</div>
+        <div class="name">MAFIRA Demo Agency</div>
         <div class="role">Owner · Starter</div>
       </div>
     </div>
@@ -619,20 +639,15 @@ body { font-family: 'Inter', sans-serif; background: var(--gray-50); color: var(
       <select class="lang-select" onchange="changeLang(this.value)">
         <option value="id">🇮🇩 Indonesia</option>
         <option value="en">🇬🇧 English</option>
-        <option value="ms">🇲🇾 Melayu</option>
-        <option value="jv">☕ Jawa</option>
-        <option value="su">🌿 Sunda</option>
-        <option value="ar">🕌 Arabic</option>
-        <option value="zh">🇨🇳 中文</option>
       </select>
       <button class="topbar-btn" onclick="toggleDark()" title="Toggle dark mode">
         <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
       </button>
-      <button class="topbar-btn" style="position:relative">
+      <button class="topbar-btn" id="notifBtn" style="position:relative">
         <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
         <div class="notify-dot"></div>
       </button>
-      <div class="avatar" style="cursor:pointer">AU</div>
+      <div class="avatar" id="userAvatarBtn" style="cursor:pointer">MD</div>
     </div>
   </div>
 
@@ -643,20 +658,20 @@ body { font-family: 'Inter', sans-serif; background: var(--gray-50); color: var(
     <div class="page active" id="page-dashboard">
       <!-- Journey Banner -->
       <div class="journey-card">
-        <div class="journey-label">Perjalanan Bisnis Anda</div>
+        <div class="journey-label" data-i18n="hero.label">Perjalanan Bisnis Anda</div>
         <div class="journey-title">Makkah → Madinah</div>
-        <div class="journey-stage">📍 Tahap Musdalifah — Fondasi Operasional</div>
+        <div class="journey-stage" data-i18n="hero.stage">📍 Tahap Musdalifah — Fondasi Operasional</div>
         <div style="max-width:420px">
           <div class="journey-road">
             <div class="journey-fill"></div>
             <div class="journey-dot"></div>
           </div>
           <div class="journey-cities">
-            <span>🕋 Makkah<br><small>Memulai</small></span>
-            <span style="text-align:center">Mina<br><small>Berkembang</small></span>
-            <span style="text-align:center">Musdalifah<br><small>● Anda di sini</small></span>
-            <span style="text-align:center">Arafah<br><small>Mahir</small></span>
-            <span style="text-align:right">🕌 Madinah<br><small>Profesional</small></span>
+            <span>🕋 Makkah<br><small data-i18n="hero.city.start">Memulai</small></span>
+            <span style="text-align:center">Mina<br><small data-i18n="hero.city.growing">Berkembang</small></span>
+            <span style="text-align:center">Musdalifah<br><small data-i18n="hero.city.here">● Anda di sini</small></span>
+            <span style="text-align:center">Arafah<br><small data-i18n="hero.city.advanced">Mahir</small></span>
+            <span style="text-align:right">🕌 Madinah<br><small data-i18n="hero.city.professional">Profesional</small></span>
           </div>
         </div>
         <div class="journey-pct">62%</div>
@@ -690,7 +705,7 @@ body { font-family: 'Inter', sans-serif; background: var(--gray-50); color: var(
         </div>
 
         <div class="card">
-          <div class="card-title">Tahap Saat Ini</div>
+          <div class="card-title" data-i18n="dash.current_stage">Tahap Saat Ini</div>
           <div class="card-value" style="font-size:18px;margin-top:8px">Musdalifah</div>
           <div style="font-size:12px;color:var(--gray-400);margin-top:4px">Fondasi Operasional</div>
           <div style="margin-top:14px">
@@ -700,7 +715,7 @@ body { font-family: 'Inter', sans-serif; background: var(--gray-50); color: var(
         </div>
 
         <div class="card">
-          <div class="card-title">Tugas Hari Ini</div>
+          <div class="card-title" data-i18n="dash.today_tasks">Tugas Hari Ini</div>
           <div class="card-value">5</div>
           <div style="font-size:12px;color:var(--gray-400);margin-top:2px">2 selesai · 3 menunggu</div>
           <div style="display:flex;gap:8px;margin-top:14px">
@@ -716,7 +731,7 @@ body { font-family: 'Inter', sans-serif; background: var(--gray-50); color: var(
         </div>
 
         <div class="card">
-          <div class="card-title">Pilar Aktif</div>
+          <div class="card-title" data-i18n="dash.active_pillars">Pilar Aktif</div>
           <div class="card-value">6</div>
           <div style="font-size:12px;color:var(--gray-400);margin-top:2px">Semua pilar berjalan</div>
           <div style="margin-top:14px;display:flex;flex-wrap:wrap;gap:6px">
@@ -734,7 +749,7 @@ body { font-family: 'Inter', sans-serif; background: var(--gray-50); color: var(
         <!-- TODAY'S TASKS -->
         <div class="card">
           <div class="section-header">
-            <div class="section-title">Tugas Hari Ini</div>
+            <div class="section-title" data-i18n="dash.today_tasks">Tugas Hari Ini</div>
             <div class="section-link" onclick="navigate('blueprint',document.querySelector('[onclick*=blueprint]'))">Lihat semua →</div>
           </div>
 
@@ -783,7 +798,7 @@ body { font-family: 'Inter', sans-serif; background: var(--gray-50); color: var(
         <!-- RECOMMENDED ACTIONS -->
         <div>
           <div class="section-header">
-            <div class="section-title">Rekomendasi Tindakan</div>
+            <div class="section-title" data-i18n="dash.recommended_actions">Rekomendasi Tindakan</div>
           </div>
           <div style="display:flex;flex-direction:column;gap:10px">
             <div class="action-card">
@@ -816,7 +831,7 @@ body { font-family: 'Inter', sans-serif; background: var(--gray-50); color: var(
 
       <!-- MILESTONE CARDS -->
       <div class="section-header">
-        <div class="section-title">Pencapaian Terakhir</div>
+        <div class="section-title" data-i18n="dash.recent_achievements">Pencapaian Terakhir</div>
         <div class="section-link">Lihat semua →</div>
       </div>
       <div class="grid-3">
@@ -1173,7 +1188,7 @@ body { font-family: 'Inter', sans-serif; background: var(--gray-50); color: var(
     <!-- COMMUNITY -->
     <div class="page" id="page-community">
       <div style="display:flex;gap:12px;margin-bottom:20px">
-        <button style="flex:1;padding:10px;background:linear-gradient(135deg,var(--navy),var(--navy-light));color:var(--white);border:none;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer">+ Buat Diskusi Baru</button>
+        <button id="createDiscussionBtn" style="flex:1;padding:10px;background:linear-gradient(135deg,var(--navy),var(--navy-light));color:var(--white);border:none;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer">+ Buat Diskusi Baru</button>
       </div>
       <div class="tabs">
         <div class="tab active">Semua Diskusi</div>
@@ -1375,13 +1390,13 @@ body { font-family: 'Inter', sans-serif; background: var(--gray-50); color: var(
           <div class="section-title" style="margin-bottom:16px">Profil Agency</div>
           <div class="card">
             <div style="text-align:center;padding:16px 0;border-bottom:1px solid var(--gray-100);margin-bottom:16px">
-              <div style="width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--gold-light));display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:700;color:var(--navy);margin:0 auto 12px">AU</div>
-              <div style="font-size:16px;font-weight:700;color:var(--navy)">Al-Amin Tour & Travel</div>
+              <div style="width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--gold-light));display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:700;color:var(--navy);margin:0 auto 12px">MD</div>
+              <div style="font-size:16px;font-weight:700;color:var(--navy)">MAFIRA Demo Agency</div>
               <div style="font-size:12px;color:var(--gray-400)">Akun Starter · Bergabung Maret 2024</div>
             </div>
             <div class="setting-row">
               <div class="setting-label"><div class="setting-title">Nama Agency</div></div>
-              <div style="font-size:13px;color:var(--gray-600)">Al-Amin Tour & Travel</div>
+              <div style="font-size:13px;color:var(--gray-600)">MAFIRA Demo Agency</div>
             </div>
             <div class="setting-row">
               <div class="setting-label"><div class="setting-title">NPWP</div></div>
@@ -1391,7 +1406,7 @@ body { font-family: 'Inter', sans-serif; background: var(--gray-50); color: var(
               <div class="setting-label"><div class="setting-title">No. Izin PPIU</div></div>
               <div style="font-size:13px;color:var(--green);font-weight:600">D.1234/2024 ✓</div>
             </div>
-            <button style="width:100%;margin-top:12px;padding:10px;border-radius:8px;border:1px solid var(--gold);color:var(--gold);background:transparent;font-size:13px;font-weight:600;cursor:pointer;transition:all 0.2s" onmouseover="this.style.background='var(--gold)';this.style.color='var(--navy)'" onmouseout="this.style.background='transparent';this.style.color='var(--gold)'">Edit Profil Agency</button>
+            <button id="editProfileBtn" style="width:100%;margin-top:12px;padding:10px;border-radius:8px;border:1px solid var(--gold);color:var(--gold);background:transparent;font-size:13px;font-weight:600;cursor:pointer;transition:all 0.2s" onmouseover="this.style.background='var(--gold)';this.style.color='var(--navy)'" onmouseout="this.style.background='transparent';this.style.color='var(--gold)'">Edit Profil Agency</button>
           </div>
 
           <div class="section-title" style="margin:20px 0 16px">Paket & Billing</div>
@@ -1402,7 +1417,7 @@ body { font-family: 'Inter', sans-serif; background: var(--gray-50); color: var(
             <div style="font-size:12px;color:rgba(255,255,255,0.7);margin-bottom:6px">✓ 6 Pilar Blueprint</div>
             <div style="font-size:12px;color:rgba(255,255,255,0.7);margin-bottom:6px">✓ 50 Template</div>
             <div style="font-size:12px;color:rgba(255,255,255,0.7);margin-bottom:16px">✓ Community Access</div>
-            <button style="padding:8px 20px;border-radius:8px;background:var(--gold);color:var(--navy);font-size:13px;font-weight:700;border:none;cursor:pointer">Upgrade ke Pro →</button>
+            <button id="upgradeProBtn" style="padding:8px 20px;border-radius:8px;background:var(--gold);color:var(--navy);font-size:13px;font-weight:700;border:none;cursor:pointer">Upgrade ke Pro →</button>
           </div>
         </div>
       </div>
@@ -1416,26 +1431,40 @@ body { font-family: 'Inter', sans-serif; background: var(--gray-50); color: var(
   <div class="mobile-nav-items">
     <div class="mobile-nav-item active" onclick="navigate('dashboard',this);updateMobileNav(this)">
       <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
-      <span>Dashboard</span>
+      <span data-i18n="mobile.dashboard">Dashboard</span>
     </div>
     <div class="mobile-nav-item" onclick="navigate('blueprint',this);updateMobileNav(this)">
       <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-      <span>Blueprint</span>
+      <span data-i18n="mobile.blueprint">Blueprint</span>
     </div>
     <div class="mobile-nav-item" onclick="navigate('knowledge',this);updateMobileNav(this)">
       <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
-      <span>Artikel</span>
+      <span data-i18n="mobile.articles">Artikel</span>
     </div>
     <div class="mobile-nav-item" onclick="navigate('community',this);updateMobileNav(this)">
       <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-      <span>Forum</span>
+      <span data-i18n="mobile.forum">Forum</span>
     </div>
     <div class="mobile-nav-item" onclick="navigate('settings',this);updateMobileNav(this)">
       <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-      <span>Pengaturan</span>
+      <span data-i18n="mobile.settings">Pengaturan</span>
     </div>
   </div>
 </nav>
+
+<!-- REUSABLE MODAL (shared by all interactions) -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
+  <div class="modal-box" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <div class="modal-title" id="modalTitle"></div>
+      <div class="modal-close" onclick="closeModal()">✕</div>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
 
 </div><!-- end app -->
 
@@ -1448,6 +1477,13 @@ window.addEventListener('load', () => {
     setTimeout(() => {
       l.style.display = 'none';
       document.getElementById('app').style.display = 'flex';
+      // Trigger initial page transition
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          const dashPage = document.getElementById('page-dashboard');
+          if (dashPage) dashPage.classList.add('visible');
+        });
+      });
     }, 600);
   }, 2400);
 });
@@ -1465,11 +1501,52 @@ const pageTitles = {
 };
 
 function navigate(page, el) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.getElementById('page-' + page).classList.add('active');
-  document.getElementById('pageTitle').textContent = pageTitles[page] || page;
+  // Hide all pages
+  document.querySelectorAll('.page').forEach(p => {
+    p.classList.remove('visible');
+    setTimeout(() => { if (!p.classList.contains('active')) {} }, 250);
+  });
+
+  // Small delay for transition out
+  setTimeout(() => {
+    document.querySelectorAll('.page').forEach(p => {
+      p.classList.remove('active');
+      p.classList.remove('visible');
+    });
+
+    const target = document.getElementById('page-' + page);
+    if (target) {
+      target.classList.add('active');
+      // Trigger transition in on next frame
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          target.classList.add('visible');
+        });
+      });
+    }
+
+    document.getElementById('pageTitle').textContent = pageTitles[page] || page;
+  }, 80);
+
+  // Update sidebar active state — match both direct clicks and programmatic calls
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-  if (el && el.classList && el.classList.contains('nav-item')) el.classList.add('active');
+  // Find the nav-item with onclick matching this page
+  document.querySelectorAll('.nav-item').forEach(n => {
+    const oc = n.getAttribute('onclick') || '';
+    if (oc.includes("'" + page + "'") || oc.includes('"' + page + '"')) {
+      n.classList.add('active');
+    }
+  });
+
+  // Update mobile nav
+  document.querySelectorAll('.mobile-nav-item').forEach(n => {
+    const oc = n.getAttribute('onclick') || '';
+    if (oc.includes("'" + page + "'") || oc.includes('"' + page + '"')) {
+      n.classList.add('active');
+    } else {
+      n.classList.remove('active');
+    }
+  });
 
   // Close sidebar on mobile
   if (window.innerWidth <= 768) {
@@ -1493,17 +1570,80 @@ function toggleDark() {
   if (dt) dt.classList.toggle('on');
 }
 
+const i18n = {
+  id: {
+    'nav.overview': 'Overview',
+    'nav.resources': 'Resources',
+    'nav.community': 'Community',
+    'nav.account': 'Account',
+    'nav.dashboard': 'Dashboard',
+    'nav.blueprint': 'Blueprint',
+    'nav.knowledge': 'Knowledge Base',
+    'nav.templates': 'Templates',
+    'nav.vendor': 'Vendor Directory',
+    'nav.consultation': 'Consultation',
+    'nav.settings': 'Settings',
+    'mobile.dashboard': 'Dashboard',
+    'mobile.blueprint': 'Blueprint',
+    'mobile.articles': 'Artikel',
+    'mobile.forum': 'Forum',
+    'mobile.settings': 'Pengaturan',
+    'hero.label': 'Perjalanan Bisnis Anda',
+    'hero.stage': '📍 Tahap Musdalifah — Fondasi Operasional',
+    'hero.city.start': 'Memulai',
+    'hero.city.growing': 'Berkembang',
+    'hero.city.here': '● Anda di sini',
+    'hero.city.advanced': 'Mahir',
+    'hero.city.professional': 'Profesional',
+    'dash.current_stage': 'Tahap Saat Ini',
+    'dash.today_tasks': 'Tugas Hari Ini',
+    'dash.active_pillars': 'Pilar Aktif',
+    'dash.recommended_actions': 'Rekomendasi Tindakan',
+    'dash.recent_achievements': 'Pencapaian Terakhir'
+  },
+  en: {
+    'nav.overview': 'Overview',
+    'nav.resources': 'Resources',
+    'nav.community': 'Community',
+    'nav.account': 'Account',
+    'nav.dashboard': 'Dashboard',
+    'nav.blueprint': 'Blueprint',
+    'nav.knowledge': 'Knowledge Base',
+    'nav.templates': 'Templates',
+    'nav.vendor': 'Vendor Directory',
+    'nav.consultation': 'Consultation',
+    'nav.settings': 'Settings',
+    'mobile.dashboard': 'Dashboard',
+    'mobile.blueprint': 'Blueprint',
+    'mobile.articles': 'Articles',
+    'mobile.forum': 'Forum',
+    'mobile.settings': 'Settings',
+    'hero.label': 'Your Business Journey',
+    'hero.stage': '📍 Musdalifah Stage — Operational Foundation',
+    'hero.city.start': 'Starting',
+    'hero.city.growing': 'Growing',
+    'hero.city.here': '● You are here',
+    'hero.city.advanced': 'Advanced',
+    'hero.city.professional': 'Professional',
+    'dash.current_stage': 'Current Stage',
+    'dash.today_tasks': "Today's Tasks",
+    'dash.active_pillars': 'Active Pillars',
+    'dash.recommended_actions': 'Recommended Actions',
+    'dash.recent_achievements': 'Recent Achievements'
+  }
+};
+
+function applyLanguage(lang) {
+  const dict = i18n[lang] || i18n.id;
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    if (dict[key] !== undefined) el.textContent = dict[key];
+  });
+  document.documentElement.setAttribute('lang', lang);
+}
+
 function changeLang(lang) {
-  // Placeholder for i18n
-  const labels = {
-    id: 'Dashboard',
-    en: 'Dashboard',
-    ms: 'Papan Pemuka',
-    jv: 'Panggenan Utama',
-    su: 'Dasbor',
-    ar: 'لوحة التحكم',
-    zh: '仪表板'
-  };
+  applyLanguage(lang);
 }
 
 function updateMobileNav(el) {
@@ -1545,6 +1685,100 @@ document.querySelectorAll('.task-check').forEach(check => {
 document.getElementById('main').addEventListener('click', () => {
   if (window.innerWidth <= 768) {
     document.getElementById('sidebar').classList.remove('open');
+  }
+});
+
+// ===== Reusable Modal + Toast interactivity layer =====
+function openModal(title, bodyHtml) {
+  document.getElementById('modalTitle').textContent = title;
+  document.getElementById('modalBody').innerHTML = bodyHtml;
+  document.getElementById('modalOverlay').classList.add('open');
+}
+function closeModal(e) {
+  if (e && e.target.id !== 'modalOverlay') return;
+  document.getElementById('modalOverlay').classList.remove('open');
+}
+let toastTimer;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+document.addEventListener('click', function(e) {
+  if (e.target.closest('.dl-btn')) { showToast('Demo download started'); return; }
+
+  const actBtn = e.target.closest('.action-btn');
+  if (actBtn) {
+    const card = actBtn.closest('.action-card');
+    openModal(card.querySelector('.action-title').textContent, '<p>' + card.querySelector('.action-desc').textContent + '</p>');
+    return;
+  }
+
+  if (e.target.closest('.toggle')) { showToast('Settings updated successfully'); return; }
+
+  const kb = e.target.closest('.kb-card');
+  if (kb) {
+    openModal(kb.querySelector('.kb-title').textContent,
+      '<p>' + kb.querySelector('.kb-meta').textContent + '</p><p style="margin-top:10px">Pratinjau singkat: artikel ini membahas langkah praktis, checklist, dan contoh dokumen yang bisa langsung diterapkan oleh agency Anda.</p>');
+    return;
+  }
+
+  const tpl = e.target.closest('.template-card');
+  if (tpl) {
+    openModal(tpl.querySelector('.template-name').textContent,
+      '<p>' + tpl.querySelector('.template-desc').textContent + '</p><button class="modal-btn" onclick="showToast(\'Demo download started\')">⬇ Download Template</button>');
+    return;
+  }
+
+  const vendor = e.target.closest('.vendor-card');
+  if (vendor) {
+    openModal(vendor.querySelector('.vendor-name').textContent,
+      '<p>' + vendor.querySelector('.vendor-cat').textContent + '</p><p style="margin-top:8px">' + vendor.querySelector('.vendor-rating').textContent + '</p>');
+    return;
+  }
+
+  const consult = e.target.closest('.consult-card');
+  if (consult) {
+    openModal(consult.querySelector('.expert-name').textContent,
+      '<p>' + consult.querySelector('.expert-title').textContent + '</p><button class="modal-btn" onclick="showToast(\'Booking request sent\')">📅 Book Consultation</button>');
+    return;
+  }
+
+  const milestone = e.target.closest('.milestone-card');
+  if (milestone) {
+    openModal(milestone.querySelector('.milestone-title').textContent, '<p>' + milestone.querySelector('.milestone-desc').textContent + '</p>');
+    return;
+  }
+
+  const link = e.target.closest('.section-link');
+  if (link && !link.getAttribute('onclick')) { showToast('More details coming soon'); return; }
+
+  if (e.target.closest('.post-act')) { showToast('Feature coming soon'); return; }
+  if (e.target.closest('.search-bar input')) { showToast('Search feature coming soon'); return; }
+  if (e.target.closest('#editProfileBtn')) { openModal('Edit Profile Agency', '<p>Profile editor coming soon.</p>'); return; }
+  if (e.target.closest('#createDiscussionBtn')) { openModal('Create Discussion', '<p>Community posting coming soon.</p>'); return; }
+
+  if (e.target.closest('#upgradeProBtn')) {
+    openModal('Starter vs Pro',
+      '<p><strong>Starter:</strong> 6 Pilar Blueprint · 50 Template · Community Access</p>' +
+      '<p style="margin-top:10px"><strong>Pro:</strong> Semua fitur Starter + Template tanpa batas · Konsultasi pakar gratis 2x/bulan · Priority support</p>');
+    return;
+  }
+
+  if (e.target.closest('#notifBtn')) {
+    openModal('Notifications',
+      '<p>🔔 Sertifikat PPIU Anda akan kadaluarsa dalam 47 hari.</p>' +
+      '<p style="margin-top:8px">🔔 2 Tour Leader baru menunggu verifikasi.</p>' +
+      '<p style="margin-top:8px">🔔 Komentar baru di diskusi komunitas Anda.</p>');
+    return;
+  }
+
+  if (e.target.closest('#userAvatarBtn')) {
+    openModal('Account Summary', '<p>MAFIRA Demo Agency</p><p style="margin-top:4px">Owner · Starter Plan</p><p style="margin-top:8px">Travel Readiness Score: 762/1000</p>');
+    return;
   }
 });
 </script>
