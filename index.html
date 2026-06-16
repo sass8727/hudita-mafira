@@ -1,0 +1,1552 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HUDITA by MAFIRA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --navy: #0D1B3E;
+  --navy-mid: #162650;
+  --navy-light: #1E3370;
+  --gold: #C9A84C;
+  --gold-light: #E4C87A;
+  --gold-pale: #F5EDD6;
+  --white: #FFFFFF;
+  --gray-50: #F8F9FC;
+  --gray-100: #EEF0F6;
+  --gray-200: #D8DCE9;
+  --gray-400: #9099B4;
+  --gray-600: #5A6280;
+  --gray-800: #2D3352;
+  --green: #2E7D52;
+  --green-light: #E8F5EE;
+  --amber: #B45309;
+  --amber-light: #FEF3C7;
+  --red: #991B1B;
+  --red-light: #FEE2E2;
+  --shadow-sm: 0 1px 3px rgba(13,27,62,0.08);
+  --shadow-md: 0 4px 16px rgba(13,27,62,0.12);
+  --shadow-lg: 0 8px 32px rgba(13,27,62,0.16);
+  --radius: 12px;
+  --radius-sm: 8px;
+  --radius-lg: 16px;
+}
+.dark {
+  --white: #0A1228;
+  --gray-50: #0D1835;
+  --gray-100: #162040;
+  --gray-200: #1E2E52;
+  --gray-400: #6A779A;
+  --gray-600: #8E9ABE;
+  --gray-800: #C8D0E8;
+  --navy: #1E3370;
+  --navy-mid: #2A4490;
+  --navy-light: #3655B0;
+  --gold-pale: #2A2010;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.3);
+  --shadow-md: 0 4px 16px rgba(0,0,0,0.4);
+  --shadow-lg: 0 8px 32px rgba(0,0,0,0.5);
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Inter', sans-serif; background: var(--gray-50); color: var(--gray-800); min-height: 100vh; transition: background 0.3s, color 0.3s; }
+
+/* LOADING SCREEN */
+#loading {
+  position: fixed; inset: 0; background: var(--navy); z-index: 9999;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  transition: opacity 0.6s;
+}
+.kaaba-svg { width: 80px; height: 80px; margin-bottom: 24px; animation: pulse 2s ease-in-out infinite; }
+@keyframes pulse { 0%,100%{opacity:0.8;transform:scale(1)} 50%{opacity:1;transform:scale(1.05)} }
+.loading-brand { color: var(--gold); font-family: 'Playfair Display', serif; font-size: 28px; letter-spacing: 3px; }
+.loading-sub { color: rgba(201,168,76,0.6); font-size: 11px; letter-spacing: 5px; text-transform: uppercase; margin-top: 6px; }
+.loading-bar { width: 200px; height: 2px; background: rgba(255,255,255,0.1); border-radius: 2px; margin-top: 32px; overflow: hidden; }
+.loading-fill { height: 100%; background: linear-gradient(90deg, var(--gold), var(--gold-light)); border-radius: 2px; animation: loadfill 2.2s ease forwards; }
+@keyframes loadfill { 0%{width:0%} 100%{width:100%} }
+
+/* LAYOUT */
+.app { display: flex; min-height: 100vh; }
+.sidebar {
+  width: 240px; background: var(--navy); color: var(--white);
+  display: flex; flex-direction: column; position: fixed; top: 0; left: 0; height: 100vh;
+  z-index: 100; transition: transform 0.3s, width 0.3s;
+  overflow-y: auto;
+}
+.sidebar.collapsed { width: 64px; }
+.main { margin-left: 240px; flex: 1; display: flex; flex-direction: column; min-height: 100vh; transition: margin-left 0.3s; }
+.main.expanded { margin-left: 64px; }
+.topbar {
+  background: var(--white); border-bottom: 1px solid var(--gray-100);
+  padding: 0 24px; height: 60px; display: flex; align-items: center; justify-content: space-between;
+  position: sticky; top: 0; z-index: 50; box-shadow: var(--shadow-sm);
+}
+.content { padding: 28px 24px; flex: 1; }
+
+/* SIDEBAR ELEMENTS */
+.sidebar-logo {
+  padding: 20px 16px; display: flex; align-items: center; gap: 10px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+.logo-mark { width: 36px; height: 36px; flex-shrink: 0; }
+.logo-text { font-family: 'Playfair Display', serif; }
+.logo-title { font-size: 16px; color: var(--gold); letter-spacing: 1px; line-height: 1; }
+.logo-sub { font-size: 9px; color: rgba(201,168,76,0.6); letter-spacing: 3px; text-transform: uppercase; }
+.sidebar.collapsed .logo-text { display: none; }
+
+.nav-section { padding: 12px 8px 4px; }
+.nav-label { font-size: 9px; letter-spacing: 2px; color: rgba(255,255,255,0.3); text-transform: uppercase; padding: 0 8px 6px; }
+.sidebar.collapsed .nav-label { display: none; }
+.nav-item {
+  display: flex; align-items: center; gap: 10px; padding: 9px 12px;
+  border-radius: var(--radius-sm); cursor: pointer; transition: all 0.2s;
+  color: rgba(255,255,255,0.65); font-size: 13.5px; font-weight: 500; white-space: nowrap;
+  position: relative;
+}
+.nav-item:hover { background: rgba(255,255,255,0.08); color: var(--white); }
+.nav-item.active { background: rgba(201,168,76,0.15); color: var(--gold); }
+.nav-item.active::before {
+  content: ''; position: absolute; left: 0; top: 50%; transform: translateY(-50%);
+  width: 3px; height: 20px; background: var(--gold); border-radius: 0 2px 2px 0;
+}
+.nav-icon { width: 18px; height: 18px; flex-shrink: 0; }
+.nav-text { flex: 1; }
+.sidebar.collapsed .nav-text { display: none; }
+.badge { background: var(--gold); color: var(--navy); font-size: 10px; font-weight: 700; padding: 1px 6px; border-radius: 10px; }
+.sidebar.collapsed .badge { display: none; }
+
+.sidebar-footer {
+  margin-top: auto; padding: 16px; border-top: 1px solid rgba(255,255,255,0.08);
+}
+.user-card { display: flex; align-items: center; gap: 10px; }
+.avatar { width: 34px; height: 34px; border-radius: 50%; background: linear-gradient(135deg, var(--gold), var(--gold-light)); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; color: var(--navy); flex-shrink: 0; }
+.user-info .name { font-size: 13px; color: var(--white); font-weight: 600; }
+.user-info .role { font-size: 11px; color: rgba(255,255,255,0.4); }
+.sidebar.collapsed .user-info { display: none; }
+
+/* TOPBAR */
+.topbar-left { display: flex; align-items: center; gap: 12px; }
+.topbar-right { display: flex; align-items: center; gap: 8px; }
+.page-title { font-size: 17px; font-weight: 700; color: var(--navy); }
+.dark .page-title { color: var(--gold-light); }
+.topbar-btn {
+  width: 36px; height: 36px; border: none; border-radius: var(--radius-sm); background: var(--gray-50);
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  color: var(--gray-600); transition: all 0.2s; font-size: 14px;
+}
+.topbar-btn:hover { background: var(--gray-100); color: var(--navy); }
+.lang-select {
+  border: 1px solid var(--gray-200); border-radius: var(--radius-sm); padding: 6px 10px;
+  font-size: 12px; background: var(--white); color: var(--gray-800); cursor: pointer;
+  font-family: 'Inter', sans-serif; outline: none;
+}
+.hamburger { display: none; }
+
+/* CARDS */
+.card {
+  background: var(--white); border-radius: var(--radius); padding: 20px;
+  box-shadow: var(--shadow-sm); border: 1px solid var(--gray-100); transition: box-shadow 0.2s;
+}
+.card:hover { box-shadow: var(--shadow-md); }
+.card-title { font-size: 13px; font-weight: 600; color: var(--gray-600); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+.card-value { font-size: 32px; font-weight: 700; color: var(--navy); line-height: 1; }
+.dark .card-value { color: var(--gold-light); }
+
+/* GRID */
+.grid-4 { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; }
+.grid-3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; }
+.grid-2 { display: grid; grid-template-columns: repeat(2,1fr); gap: 16px; }
+.col-span-2 { grid-column: span 2; }
+.col-span-3 { grid-column: span 3; }
+
+/* JOURNEY CARD */
+.journey-card {
+  background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%);
+  border-radius: var(--radius-lg); padding: 28px; color: var(--white);
+  position: relative; overflow: hidden; margin-bottom: 24px;
+}
+.journey-card::before {
+  content: ''; position: absolute; right: -30px; top: -30px;
+  width: 180px; height: 180px; border-radius: 50%;
+  background: rgba(201,168,76,0.08); pointer-events: none;
+}
+.journey-card::after {
+  content: ''; position: absolute; right: 20px; bottom: -40px;
+  width: 120px; height: 120px; border-radius: 50%;
+  background: rgba(201,168,76,0.05); pointer-events: none;
+}
+.journey-label { font-size: 11px; letter-spacing: 2px; color: rgba(201,168,76,0.7); text-transform: uppercase; margin-bottom: 8px; }
+.journey-title { font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 700; color: var(--white); margin-bottom: 4px; }
+.journey-stage { font-size: 13px; color: rgba(255,255,255,0.6); margin-bottom: 24px; }
+.journey-road {
+  position: relative; height: 6px; background: rgba(255,255,255,0.12);
+  border-radius: 6px; margin-bottom: 12px;
+}
+.journey-fill {
+  position: absolute; left: 0; top: 0; height: 100%;
+  background: linear-gradient(90deg, var(--gold), var(--gold-light));
+  border-radius: 6px; width: 62%;
+  box-shadow: 0 0 12px rgba(201,168,76,0.5);
+}
+.journey-dot {
+  position: absolute; top: 50%; transform: translateY(-50%);
+  width: 14px; height: 14px; border-radius: 50%;
+  background: var(--gold); border: 2px solid var(--navy);
+  box-shadow: 0 0 0 3px rgba(201,168,76,0.3);
+  left: calc(62% - 7px);
+}
+.journey-cities { display: flex; justify-content: space-between; font-size: 11px; color: rgba(255,255,255,0.4); }
+.journey-pct { font-size: 40px; font-weight: 700; color: var(--gold); position: absolute; right: 28px; top: 50%; transform: translateY(-50%); }
+
+/* SCORE RING */
+.score-ring-wrap { display: flex; align-items: center; gap: 20px; }
+.score-ring { position: relative; width: 100px; height: 100px; flex-shrink: 0; }
+.score-ring svg { transform: rotate(-90deg); }
+.score-ring-num {
+  position: absolute; inset: 0; display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+}
+.score-ring-num .num { font-size: 22px; font-weight: 700; color: var(--navy); line-height: 1; }
+.dark .score-ring-num .num { color: var(--gold-light); }
+.score-ring-num .lbl { font-size: 9px; color: var(--gray-400); text-transform: uppercase; letter-spacing: 1px; }
+
+/* PILLAR CARD */
+.pillar-card {
+  background: var(--white); border-radius: var(--radius); padding: 18px 20px;
+  box-shadow: var(--shadow-sm); border: 1px solid var(--gray-100);
+  cursor: pointer; transition: all 0.2s; position: relative; overflow: hidden;
+}
+.pillar-card::before {
+  content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px;
+  border-radius: 4px 0 0 4px;
+}
+.pillar-card.p1::before { background: #3B82F6; }
+.pillar-card.p2::before { background: #8B5CF6; }
+.pillar-card.p3::before { background: #10B981; }
+.pillar-card.p4::before { background: #F59E0B; }
+.pillar-card.p5::before { background: #EF4444; }
+.pillar-card.p6::before { background: var(--gold); }
+.pillar-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+.pillar-header { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+.pillar-icon { width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+.pillar-name { font-size: 14px; font-weight: 700; color: var(--navy); }
+.dark .pillar-name { color: var(--gold-light); }
+.pillar-desc { font-size: 11px; color: var(--gray-400); }
+.pillar-stats { display: flex; gap: 16px; margin-top: 14px; }
+.pstat { text-align: center; }
+.pstat-val { font-size: 18px; font-weight: 700; color: var(--navy); }
+.dark .pstat-val { color: var(--white); }
+.pstat-lbl { font-size: 10px; color: var(--gray-400); }
+.progress-bar { height: 6px; background: var(--gray-100); border-radius: 6px; overflow: hidden; margin: 10px 0; }
+.progress-fill { height: 100%; border-radius: 6px; transition: width 0.5s; }
+.p1-fill { background: #3B82F6; }
+.p2-fill { background: #8B5CF6; }
+.p3-fill { background: #10B981; }
+.p4-fill { background: #F59E0B; }
+.p5-fill { background: #EF4444; }
+.p6-fill { background: var(--gold); }
+
+/* TASK ITEM */
+.task-item {
+  display: flex; align-items: flex-start; gap: 10px; padding: 10px 0;
+  border-bottom: 1px solid var(--gray-100);
+}
+.task-item:last-child { border-bottom: none; }
+.task-check {
+  width: 18px; height: 18px; border: 2px solid var(--gray-200); border-radius: 4px;
+  flex-shrink: 0; cursor: pointer; display: flex; align-items: center; justify-content: center;
+  margin-top: 1px; transition: all 0.2s;
+}
+.task-check:hover { border-color: var(--gold); }
+.task-check.done { background: var(--green); border-color: var(--green); }
+.task-text { flex: 1; }
+.task-title { font-size: 13px; font-weight: 500; color: var(--gray-800); }
+.task-meta { font-size: 11px; color: var(--gray-400); margin-top: 2px; }
+.task-tag {
+  font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 10px;
+  flex-shrink: 0; align-self: flex-start;
+}
+.tag-urgent { background: var(--red-light); color: var(--red); }
+.tag-today { background: var(--amber-light); color: var(--amber); }
+.tag-done { background: var(--green-light); color: var(--green); }
+
+/* ACTION CARD */
+.action-card {
+  background: linear-gradient(135deg, var(--gold-pale), #FFF8EC);
+  border: 1px solid rgba(201,168,76,0.25); border-radius: var(--radius);
+  padding: 16px 18px; display: flex; align-items: flex-start; gap: 12px;
+}
+.dark .action-card { background: rgba(201,168,76,0.06); }
+.action-icon { font-size: 22px; flex-shrink: 0; }
+.action-title { font-size: 13px; font-weight: 600; color: var(--navy); margin-bottom: 2px; }
+.dark .action-title { color: var(--gold-light); }
+.action-desc { font-size: 12px; color: var(--gray-600); }
+.action-btn {
+  margin-top: 8px; padding: 5px 12px; border-radius: 6px;
+  background: var(--gold); color: var(--navy); font-size: 12px; font-weight: 600;
+  border: none; cursor: pointer; transition: all 0.2s;
+}
+.action-btn:hover { background: var(--gold-light); }
+
+/* KNOWLEDGE BASE */
+.kb-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.kb-card {
+  background: var(--white); border-radius: var(--radius); overflow: hidden;
+  box-shadow: var(--shadow-sm); border: 1px solid var(--gray-100);
+  cursor: pointer; transition: all 0.2s;
+}
+.kb-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+.kb-thumb { height: 100px; display: flex; align-items: center; justify-content: center; font-size: 40px; }
+.kb-body { padding: 14px; }
+.kb-cat { font-size: 10px; letter-spacing: 1px; color: var(--gold); font-weight: 600; text-transform: uppercase; margin-bottom: 4px; }
+.kb-title { font-size: 13px; font-weight: 600; color: var(--navy); margin-bottom: 4px; }
+.dark .kb-title { color: var(--white); }
+.kb-meta { font-size: 11px; color: var(--gray-400); }
+
+/* VENDOR */
+.vendor-card {
+  background: var(--white); border-radius: var(--radius); padding: 16px 20px;
+  box-shadow: var(--shadow-sm); border: 1px solid var(--gray-100);
+  display: flex; align-items: center; gap: 14px; cursor: pointer; transition: all 0.2s;
+}
+.vendor-card:hover { box-shadow: var(--shadow-md); }
+.vendor-logo { width: 44px; height: 44px; border-radius: 10px; background: var(--gray-50); display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+.vendor-name { font-size: 14px; font-weight: 700; color: var(--navy); }
+.dark .vendor-name { color: var(--white); }
+.vendor-cat { font-size: 11px; color: var(--gray-400); }
+.vendor-rating { display: flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 600; color: var(--amber); margin-left: auto; }
+.verified { margin-left: 6px; font-size: 10px; background: var(--green-light); color: var(--green); padding: 2px 6px; border-radius: 10px; font-weight: 600; }
+
+/* COMMUNITY */
+.post-card {
+  background: var(--white); border-radius: var(--radius); padding: 18px 20px;
+  box-shadow: var(--shadow-sm); border: 1px solid var(--gray-100); margin-bottom: 14px;
+}
+.post-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.post-avatar { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; color: var(--white); }
+.post-user { font-size: 13px; font-weight: 600; color: var(--navy); }
+.dark .post-user { color: var(--white); }
+.post-time { font-size: 11px; color: var(--gray-400); }
+.post-body { font-size: 13px; color: var(--gray-600); line-height: 1.6; margin-bottom: 12px; }
+.post-actions { display: flex; gap: 14px; }
+.post-act { display: flex; align-items: center; gap: 5px; font-size: 12px; color: var(--gray-400); cursor: pointer; transition: color 0.2s; }
+.post-act:hover { color: var(--navy); }
+
+/* CONSULTATION */
+.consult-card {
+  background: var(--white); border-radius: var(--radius); padding: 20px;
+  box-shadow: var(--shadow-sm); border: 1px solid var(--gray-100);
+  display: flex; gap: 16px; align-items: flex-start;
+}
+.expert-avatar { width: 56px; height: 56px; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 22px; }
+.expert-name { font-size: 15px; font-weight: 700; color: var(--navy); }
+.dark .expert-name { color: var(--white); }
+.expert-title { font-size: 12px; color: var(--gray-400); margin-bottom: 6px; }
+.book-btn {
+  padding: 7px 16px; background: linear-gradient(135deg, var(--navy), var(--navy-light));
+  color: var(--white); border-radius: 8px; font-size: 12px; font-weight: 600;
+  border: none; cursor: pointer; transition: all 0.2s; margin-top: 10px;
+}
+.book-btn:hover { opacity: 0.9; transform: translateY(-1px); }
+
+/* SETTINGS */
+.setting-row {
+  display: flex; align-items: center; padding: 16px 0; border-bottom: 1px solid var(--gray-100);
+}
+.setting-row:last-child { border-bottom: none; }
+.setting-label { flex: 1; }
+.setting-title { font-size: 14px; font-weight: 600; color: var(--gray-800); }
+.setting-desc { font-size: 12px; color: var(--gray-400); margin-top: 2px; }
+.toggle {
+  width: 44px; height: 24px; border-radius: 12px; background: var(--gray-200);
+  position: relative; cursor: pointer; transition: background 0.2s; flex-shrink: 0;
+}
+.toggle.on { background: var(--gold); }
+.toggle::after {
+  content: ''; position: absolute; width: 20px; height: 20px; border-radius: 50%;
+  background: var(--white); top: 2px; left: 2px; transition: left 0.2s;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+}
+.toggle.on::after { left: 22px; }
+
+/* TEMPLATES */
+.template-card {
+  background: var(--white); border-radius: var(--radius); padding: 18px;
+  box-shadow: var(--shadow-sm); border: 1px solid var(--gray-100);
+  cursor: pointer; transition: all 0.2s; text-align: center;
+}
+.template-card:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); }
+.template-icon { font-size: 36px; margin-bottom: 10px; }
+.template-name { font-size: 13px; font-weight: 600; color: var(--navy); margin-bottom: 4px; }
+.dark .template-name { color: var(--white); }
+.template-desc { font-size: 11px; color: var(--gray-400); }
+.dl-btn {
+  margin-top: 12px; padding: 6px 14px; border: 1px solid var(--gold);
+  color: var(--gold); border-radius: 6px; font-size: 11px; font-weight: 600;
+  background: transparent; cursor: pointer; transition: all 0.2s;
+}
+.dl-btn:hover { background: var(--gold); color: var(--navy); }
+
+/* MILESTONE */
+.milestone-card {
+  background: linear-gradient(135deg, #1A2F60 0%, #0D1B3E 100%);
+  border: 1px solid rgba(201,168,76,0.2); border-radius: var(--radius);
+  padding: 16px 18px; display: flex; align-items: center; gap: 12px;
+}
+.milestone-icon { font-size: 28px; }
+.milestone-title { font-size: 13px; font-weight: 700; color: var(--gold); margin-bottom: 2px; }
+.milestone-desc { font-size: 11px; color: rgba(255,255,255,0.5); }
+
+/* SECTION HEADER */
+.section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+.section-title { font-size: 16px; font-weight: 700; color: var(--navy); }
+.dark .section-title { color: var(--gold-light); }
+.section-link { font-size: 12px; color: var(--gold); cursor: pointer; font-weight: 600; }
+.section-link:hover { text-decoration: underline; }
+
+/* SEARCH BAR */
+.search-bar {
+  display: flex; align-items: center; gap: 8px; padding: 9px 14px;
+  background: var(--gray-50); border: 1px solid var(--gray-200); border-radius: 8px;
+  margin-bottom: 20px;
+}
+.search-bar input {
+  border: none; background: transparent; flex: 1; font-size: 13px;
+  color: var(--gray-800); outline: none; font-family: 'Inter', sans-serif;
+}
+.search-bar input::placeholder { color: var(--gray-400); }
+
+/* TABS */
+.tabs { display: flex; gap: 4px; background: var(--gray-100); padding: 4px; border-radius: 10px; margin-bottom: 20px; width: fit-content; }
+.tab {
+  padding: 7px 16px; border-radius: 7px; font-size: 13px; font-weight: 500;
+  cursor: pointer; transition: all 0.2s; color: var(--gray-600);
+}
+.tab.active { background: var(--white); color: var(--navy); box-shadow: var(--shadow-sm); font-weight: 600; }
+.dark .tab.active { background: var(--navy-mid); color: var(--gold-light); }
+
+/* PAGE */
+.page { display: none; }
+.page.active { display: block; }
+
+/* NOTIFY DOT */
+.notify-dot {
+  width: 8px; height: 8px; background: var(--gold); border-radius: 50%;
+  position: absolute; top: 6px; right: 6px;
+}
+
+/* STAT BADGE */
+.stat-badge { display: flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 600; padding: 3px 8px; border-radius: 6px; }
+.stat-up { background: var(--green-light); color: var(--green); }
+.stat-down { background: var(--red-light); color: var(--red); }
+
+/* EMPTY STATE */
+.empty { text-align: center; padding: 48px 20px; }
+.empty-icon { font-size: 48px; margin-bottom: 12px; }
+.empty-title { font-size: 16px; font-weight: 700; color: var(--navy); margin-bottom: 6px; }
+.dark .empty-title { color: var(--white); }
+.empty-desc { font-size: 13px; color: var(--gray-400); }
+
+/* MOBILE BOTTOM NAV */
+.mobile-nav {
+  display: none; position: fixed; bottom: 0; left: 0; right: 0;
+  background: var(--white); border-top: 1px solid var(--gray-100);
+  padding: 8px 0 12px; z-index: 200; box-shadow: 0 -4px 12px rgba(0,0,0,0.06);
+}
+.mobile-nav-items { display: flex; }
+.mobile-nav-item {
+  flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px;
+  cursor: pointer; padding: 4px 0; transition: color 0.2s; color: var(--gray-400);
+}
+.mobile-nav-item.active { color: var(--gold); }
+.mobile-nav-item svg { width: 22px; height: 22px; }
+.mobile-nav-item span { font-size: 10px; font-weight: 500; }
+
+/* RESPONSIVE */
+@media (max-width: 1024px) {
+  .sidebar { width: 64px; }
+  .sidebar .logo-text, .sidebar .nav-text, .sidebar .nav-label, .sidebar .badge, .sidebar .user-info { display: none; }
+  .main { margin-left: 64px; }
+  .grid-4 { grid-template-columns: repeat(2,1fr); }
+  .kb-grid { grid-template-columns: repeat(2,1fr); }
+}
+@media (max-width: 768px) {
+  .sidebar { transform: translateX(-100%); width: 240px; }
+  .sidebar.open { transform: translateX(0); }
+  .sidebar.open .logo-text, .sidebar.open .nav-text, .sidebar.open .nav-label, .sidebar.open .badge, .sidebar.open .user-info { display: block; }
+  .main { margin-left: 0; }
+  .hamburger { display: flex; }
+  .mobile-nav { display: block; }
+  .content { padding: 16px; padding-bottom: 80px; }
+  .grid-4 { grid-template-columns: repeat(2,1fr); }
+  .grid-3 { grid-template-columns: 1fr; }
+  .grid-2 { grid-template-columns: 1fr; }
+  .kb-grid { grid-template-columns: 1fr; }
+  .journey-pct { position: static; transform: none; margin-top: 8px; }
+  .col-span-2, .col-span-3 { grid-column: span 1; }
+  .topbar { padding: 0 14px; }
+  .journey-card { padding: 20px; }
+  .score-ring-wrap { flex-wrap: wrap; }
+}
+@media (max-width: 480px) {
+  .grid-4 { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- LOADING SCREEN -->
+<div id="loading">
+  <svg class="kaaba-svg" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect x="20" y="28" width="40" height="40" rx="2" fill="#C9A84C" opacity="0.15"/>
+    <rect x="22" y="30" width="36" height="36" rx="2" fill="none" stroke="#C9A84C" stroke-width="1.5"/>
+    <rect x="28" y="52" width="24" height="14" rx="1" fill="#C9A84C" opacity="0.3"/>
+    <rect x="34" y="52" width="12" height="14" rx="1" fill="#C9A84C" opacity="0.5"/>
+    <rect x="10" y="30" width="4" height="38" rx="1" fill="#C9A84C" opacity="0.6"/>
+    <rect x="66" y="30" width="4" height="38" rx="1" fill="#C9A84C" opacity="0.6"/>
+    <rect x="8" y="28" width="8" height="2" rx="1" fill="#C9A84C"/>
+    <rect x="64" y="28" width="8" height="2" rx="1" fill="#C9A84C"/>
+    <rect x="16" y="20" width="48" height="4" rx="1" fill="#C9A84C" opacity="0.8"/>
+    <circle cx="40" cy="15" r="3" fill="#C9A84C"/>
+    <line x1="40" y1="12" x2="40" y2="4" stroke="#C9A84C" stroke-width="1.5"/>
+    <circle cx="40" cy="4" r="1.5" fill="#C9A84C" opacity="0.6"/>
+    <rect x="30" y="36" width="20" height="1" rx="0.5" fill="#C9A84C" opacity="0.4"/>
+    <rect x="30" y="40" width="20" height="1" rx="0.5" fill="#C9A84C" opacity="0.4"/>
+    <rect x="30" y="44" width="20" height="1" rx="0.5" fill="#C9A84C" opacity="0.4"/>
+  </svg>
+  <div class="loading-brand">HUDITA</div>
+  <div class="loading-sub">by MAFIRA</div>
+  <div class="loading-bar"><div class="loading-fill"></div></div>
+</div>
+
+<!-- APP WRAPPER -->
+<div class="app" id="app" style="display:none">
+
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <svg class="logo-mark" viewBox="0 0 36 36" fill="none">
+      <rect width="36" height="36" rx="8" fill="rgba(201,168,76,0.12)"/>
+      <rect x="9" y="14" width="18" height="18" rx="1" fill="none" stroke="#C9A84C" stroke-width="1.5"/>
+      <rect x="13" y="24" width="10" height="8" rx="0.5" fill="#C9A84C" opacity="0.4"/>
+      <rect x="15" y="24" width="6" height="8" rx="0.5" fill="#C9A84C" opacity="0.6"/>
+      <rect x="6" y="14" width="2" height="18" rx="1" fill="#C9A84C"/>
+      <rect x="28" y="14" width="2" height="18" rx="1" fill="#C9A84C"/>
+      <rect x="7" y="12" width="22" height="3" rx="1" fill="#C9A84C" opacity="0.7"/>
+      <circle cx="18" cy="9" r="2" fill="#C9A84C"/>
+    </svg>
+    <div class="logo-text">
+      <div class="logo-title">HUDITA</div>
+      <div class="logo-sub">by MAFIRA</div>
+    </div>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-label">Overview</div>
+    <div class="nav-item active" onclick="navigate('dashboard',this)">
+      <svg class="nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      <span class="nav-text">Dashboard</span>
+    </div>
+    <div class="nav-item" onclick="navigate('blueprint',this)">
+      <svg class="nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+      <span class="nav-text">Blueprint</span>
+      <span class="badge">6</span>
+    </div>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-label">Resources</div>
+    <div class="nav-item" onclick="navigate('knowledge',this)">
+      <svg class="nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+      <span class="nav-text">Knowledge Base</span>
+    </div>
+    <div class="nav-item" onclick="navigate('templates',this)">
+      <svg class="nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+      <span class="nav-text">Templates</span>
+      <span class="badge">24</span>
+    </div>
+    <div class="nav-item" onclick="navigate('vendor',this)">
+      <svg class="nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+      <span class="nav-text">Vendor Directory</span>
+    </div>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-label">Community</div>
+    <div class="nav-item" onclick="navigate('community',this)" style="position:relative">
+      <svg class="nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      <span class="nav-text">Community</span>
+      <div class="notify-dot"></div>
+    </div>
+    <div class="nav-item" onclick="navigate('consultation',this)">
+      <svg class="nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      <span class="nav-text">Consultation</span>
+    </div>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-label">Account</div>
+    <div class="nav-item" onclick="navigate('settings',this)">
+      <svg class="nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      <span class="nav-text">Settings</span>
+    </div>
+  </div>
+
+  <div class="sidebar-footer">
+    <div class="user-card">
+      <div class="avatar">AU</div>
+      <div class="user-info">
+        <div class="name">Al-Amin Tour</div>
+        <div class="role">Owner · Starter</div>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<div class="main" id="main">
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="topbar-left">
+      <button class="topbar-btn hamburger" id="hamburger" onclick="toggleSidebar()">
+        <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+      <div class="page-title" id="pageTitle">Dashboard</div>
+    </div>
+    <div class="topbar-right">
+      <select class="lang-select" onchange="changeLang(this.value)">
+        <option value="id">🇮🇩 Indonesia</option>
+        <option value="en">🇬🇧 English</option>
+        <option value="ms">🇲🇾 Melayu</option>
+        <option value="jv">☕ Jawa</option>
+        <option value="su">🌿 Sunda</option>
+        <option value="ar">🕌 Arabic</option>
+        <option value="zh">🇨🇳 中文</option>
+      </select>
+      <button class="topbar-btn" onclick="toggleDark()" title="Toggle dark mode">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </button>
+      <button class="topbar-btn" style="position:relative">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        <div class="notify-dot"></div>
+      </button>
+      <div class="avatar" style="cursor:pointer">AU</div>
+    </div>
+  </div>
+
+  <!-- PAGES -->
+  <div class="content">
+
+    <!-- DASHBOARD -->
+    <div class="page active" id="page-dashboard">
+      <!-- Journey Banner -->
+      <div class="journey-card">
+        <div class="journey-label">Perjalanan Bisnis Anda</div>
+        <div class="journey-title">Makkah → Madinah</div>
+        <div class="journey-stage">📍 Tahap Musdalifah — Fondasi Operasional</div>
+        <div style="max-width:420px">
+          <div class="journey-road">
+            <div class="journey-fill"></div>
+            <div class="journey-dot"></div>
+          </div>
+          <div class="journey-cities">
+            <span>🕋 Makkah<br><small>Memulai</small></span>
+            <span style="text-align:center">Mina<br><small>Berkembang</small></span>
+            <span style="text-align:center">Musdalifah<br><small>● Anda di sini</small></span>
+            <span style="text-align:center">Arafah<br><small>Mahir</small></span>
+            <span style="text-align:right">🕌 Madinah<br><small>Profesional</small></span>
+          </div>
+        </div>
+        <div class="journey-pct">62%</div>
+      </div>
+
+      <!-- KPI Row -->
+      <div class="grid-4" style="margin-bottom:20px">
+        <div class="card">
+          <div class="card-title">Travel Readiness Score</div>
+          <div class="score-ring-wrap">
+            <div class="score-ring">
+              <svg width="100" height="100" viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="42" stroke="var(--gray-100)" stroke-width="8" fill="none"/>
+                <circle cx="50" cy="50" r="42" stroke="url(#goldGrad)" stroke-width="8" fill="none"
+                  stroke-dasharray="263.9" stroke-dashoffset="100" stroke-linecap="round"/>
+                <defs>
+                  <linearGradient id="goldGrad" x1="0" y1="0" x2="1" y2="0">
+                    <stop offset="0%" stop-color="#C9A84C"/>
+                    <stop offset="100%" stop-color="#E4C87A"/>
+                  </linearGradient>
+                </defs>
+              </svg>
+              <div class="score-ring-num"><div class="num">762</div><div class="lbl">/ 1000</div></div>
+            </div>
+            <div>
+              <div style="font-size:20px;font-weight:700;color:var(--gold)">Baik</div>
+              <div style="font-size:11px;color:var(--gray-400)">+24 poin bulan ini</div>
+              <div class="stat-badge stat-up" style="margin-top:6px">▲ 3.2%</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">Tahap Saat Ini</div>
+          <div class="card-value" style="font-size:18px;margin-top:8px">Musdalifah</div>
+          <div style="font-size:12px;color:var(--gray-400);margin-top:4px">Fondasi Operasional</div>
+          <div style="margin-top:14px">
+            <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--gray-400);margin-bottom:4px"><span>Progress Tahap</span><span>62%</span></div>
+            <div class="progress-bar"><div class="progress-fill p3-fill" style="width:62%"></div></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">Tugas Hari Ini</div>
+          <div class="card-value">5</div>
+          <div style="font-size:12px;color:var(--gray-400);margin-top:2px">2 selesai · 3 menunggu</div>
+          <div style="display:flex;gap:8px;margin-top:14px">
+            <div style="text-align:center;flex:1;background:var(--green-light);border-radius:8px;padding:8px">
+              <div style="font-size:16px;font-weight:700;color:var(--green)">2</div>
+              <div style="font-size:10px;color:var(--green)">Selesai</div>
+            </div>
+            <div style="text-align:center;flex:1;background:var(--amber-light);border-radius:8px;padding:8px">
+              <div style="font-size:16px;font-weight:700;color:var(--amber)">3</div>
+              <div style="font-size:10px;color:var(--amber)">Menunggu</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">Pilar Aktif</div>
+          <div class="card-value">6</div>
+          <div style="font-size:12px;color:var(--gray-400);margin-top:2px">Semua pilar berjalan</div>
+          <div style="margin-top:14px;display:flex;flex-wrap:wrap;gap:6px">
+            <div style="width:28px;height:28px;border-radius:6px;background:#EFF6FF;display:flex;align-items:center;justify-content:center;font-size:14px">⚖️</div>
+            <div style="width:28px;height:28px;border-radius:6px;background:#F5F3FF;display:flex;align-items:center;justify-content:center;font-size:14px">🧭</div>
+            <div style="width:28px;height:28px;border-radius:6px;background:#ECFDF5;display:flex;align-items:center;justify-content:center;font-size:14px">👥</div>
+            <div style="width:28px;height:28px;border-radius:6px;background:#FFFBEB;display:flex;align-items:center;justify-content:center;font-size:14px">🏨</div>
+            <div style="width:28px;height:28px;border-radius:6px;background:#FEF2F2;display:flex;align-items:center;justify-content:center;font-size:14px">✈️</div>
+            <div style="width:28px;height:28px;border-radius:6px;background:var(--gold-pale);display:flex;align-items:center;justify-content:center;font-size:14px">💻</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid-2" style="margin-bottom:20px">
+        <!-- TODAY'S TASKS -->
+        <div class="card">
+          <div class="section-header">
+            <div class="section-title">Tugas Hari Ini</div>
+            <div class="section-link" onclick="navigate('blueprint',document.querySelector('[onclick*=blueprint]'))">Lihat semua →</div>
+          </div>
+
+          <div class="task-item">
+            <div class="task-check done">✓</div>
+            <div class="task-text">
+              <div class="task-title">Unggah Akta Pendirian PT</div>
+              <div class="task-meta">Legalitas · Jatuh tempo kemarin</div>
+            </div>
+            <div class="task-tag tag-done">Selesai</div>
+          </div>
+          <div class="task-item">
+            <div class="task-check done">✓</div>
+            <div class="task-text">
+              <div class="task-title">Verifikasi nomor HP Tour Leader</div>
+              <div class="task-meta">Tour Leader · Selesai pagi ini</div>
+            </div>
+            <div class="task-tag tag-done">Selesai</div>
+          </div>
+          <div class="task-item">
+            <div class="task-check"></div>
+            <div class="task-text">
+              <div class="task-title">Buat kontrak jamaah template</div>
+              <div class="task-meta">Jamaah Management · Butuh 30 menit</div>
+            </div>
+            <div class="task-tag tag-urgent">Urgent</div>
+          </div>
+          <div class="task-item">
+            <div class="task-check"></div>
+            <div class="task-text">
+              <div class="task-title">Konfirmasi rate hotel Makkah 2025</div>
+              <div class="task-meta">Hotel & Catering · 3 vendor tersedia</div>
+            </div>
+            <div class="task-tag tag-today">Hari ini</div>
+          </div>
+          <div class="task-item">
+            <div class="task-check"></div>
+            <div class="task-text">
+              <div class="task-title">Setup akun manajemen tiket penerbangan</div>
+              <div class="task-meta">Tiket & Transportasi · Garuda partnership</div>
+            </div>
+            <div class="task-tag tag-today">Hari ini</div>
+          </div>
+        </div>
+
+        <!-- RECOMMENDED ACTIONS -->
+        <div>
+          <div class="section-header">
+            <div class="section-title">Rekomendasi Tindakan</div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <div class="action-card">
+              <div class="action-icon">📋</div>
+              <div>
+                <div class="action-title">Lengkapi Dokumen PPIU</div>
+                <div class="action-desc">Sertifikat PPIU Anda akan kadaluarsa dalam 47 hari. Perbarui sekarang untuk menghindari gangguan operasional.</div>
+                <button class="action-btn">Mulai Sekarang</button>
+              </div>
+            </div>
+            <div class="action-card">
+              <div class="action-icon">🧭</div>
+              <div>
+                <div class="action-title">Rekrut 2 Tour Leader Tersertifikasi</div>
+                <div class="action-desc">Kapasitas grup Anda membutuhkan minimal 3 TL aktif. Temukan kandidat di Vendor Directory.</div>
+                <button class="action-btn">Cari TL</button>
+              </div>
+            </div>
+            <div class="action-card">
+              <div class="action-icon">💡</div>
+              <div>
+                <div class="action-title">Aktifkan Sistem CRM Jamaah</div>
+                <div class="action-desc">Agency dengan CRM aktif mencatat 40% peningkatan retensi jamaah. Coba template gratis kami.</div>
+                <button class="action-btn">Coba Gratis</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- MILESTONE CARDS -->
+      <div class="section-header">
+        <div class="section-title">Pencapaian Terakhir</div>
+        <div class="section-link">Lihat semua →</div>
+      </div>
+      <div class="grid-3">
+        <div class="milestone-card">
+          <div class="milestone-icon">🏆</div>
+          <div>
+            <div class="milestone-title">Legalitas 100% Lengkap</div>
+            <div class="milestone-desc">Semua dokumen legal terverifikasi · 3 hari lalu</div>
+          </div>
+        </div>
+        <div class="milestone-card">
+          <div class="milestone-icon">⭐</div>
+          <div>
+            <div class="milestone-title">100 Jamaah Terdaftar</div>
+            <div class="milestone-desc">Milestone jamaah pertama tercapai · 1 minggu lalu</div>
+          </div>
+        </div>
+        <div class="milestone-card">
+          <div class="milestone-icon">🤝</div>
+          <div>
+            <div class="milestone-title">Partner Hotel Bintang 5</div>
+            <div class="milestone-desc">Kontrak Pullman Zamzam ditandatangani · 2 minggu lalu</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BLUEPRINT -->
+    <div class="page" id="page-blueprint">
+      <div class="section-header" style="margin-bottom:20px">
+        <div>
+          <div class="section-title" style="font-size:20px">Blueprint 6 Pilar</div>
+          <div style="font-size:13px;color:var(--gray-400);margin-top:2px">Sistem profesionalisasi bisnis Umrah Anda</div>
+        </div>
+        <div style="display:flex;gap:8px">
+          <div style="text-align:center;background:var(--white);border:1px solid var(--gray-100);border-radius:10px;padding:10px 20px">
+            <div style="font-size:22px;font-weight:700;color:var(--gold)">62%</div>
+            <div style="font-size:11px;color:var(--gray-400)">Overall Progress</div>
+          </div>
+          <div style="text-align:center;background:var(--white);border:1px solid var(--gray-100);border-radius:10px;padding:10px 20px">
+            <div style="font-size:22px;font-weight:700;color:var(--navy)">762</div>
+            <div style="font-size:11px;color:var(--gray-400)">Total Score</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid-3">
+        <!-- P1: Legalitas -->
+        <div class="pillar-card p1" onclick="showPillarDetail(1)">
+          <div class="pillar-header">
+            <div class="pillar-icon" style="background:#EFF6FF;color:#3B82F6">⚖️</div>
+            <div>
+              <div class="pillar-name">Legalitas</div>
+              <div class="pillar-desc">Izin, sertifikat & regulasi</div>
+            </div>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--gray-400);margin-bottom:4px">
+            <span>Progress</span><span style="font-weight:600;color:#3B82F6">88%</span>
+          </div>
+          <div class="progress-bar"><div class="progress-fill p1-fill" style="width:88%"></div></div>
+          <div class="pillar-stats">
+            <div class="pstat"><div class="pstat-val" style="color:#3B82F6">880</div><div class="pstat-lbl">Skor</div></div>
+            <div class="pstat"><div class="pstat-val">1</div><div class="pstat-lbl">Tugas Terbuka</div></div>
+            <div class="pstat"><div class="pstat-val" style="color:var(--green)">✓</div><div class="pstat-lbl">PPIU Aktif</div></div>
+          </div>
+        </div>
+
+        <!-- P2: Tour Leader -->
+        <div class="pillar-card p2" onclick="showPillarDetail(2)">
+          <div class="pillar-header">
+            <div class="pillar-icon" style="background:#F5F3FF;color:#8B5CF6">🧭</div>
+            <div>
+              <div class="pillar-name">Tour Leader</div>
+              <div class="pillar-desc">Rekrutmen & sertifikasi TL</div>
+            </div>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--gray-400);margin-bottom:4px">
+            <span>Progress</span><span style="font-weight:600;color:#8B5CF6">55%</span>
+          </div>
+          <div class="progress-bar"><div class="progress-fill p2-fill" style="width:55%"></div></div>
+          <div class="pillar-stats">
+            <div class="pstat"><div class="pstat-val" style="color:#8B5CF6">550</div><div class="pstat-lbl">Skor</div></div>
+            <div class="pstat"><div class="pstat-val">3</div><div class="pstat-lbl">Tugas Terbuka</div></div>
+            <div class="pstat"><div class="pstat-val">2/4</div><div class="pstat-lbl">TL Aktif</div></div>
+          </div>
+        </div>
+
+        <!-- P3: Jamaah -->
+        <div class="pillar-card p3" onclick="showPillarDetail(3)">
+          <div class="pillar-header">
+            <div class="pillar-icon" style="background:#ECFDF5;color:#10B981">👥</div>
+            <div>
+              <div class="pillar-name">Jamaah Management</div>
+              <div class="pillar-desc">Pendaftaran & layanan jamaah</div>
+            </div>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--gray-400);margin-bottom:4px">
+            <span>Progress</span><span style="font-weight:600;color:#10B981">72%</span>
+          </div>
+          <div class="progress-bar"><div class="progress-fill p3-fill" style="width:72%"></div></div>
+          <div class="pillar-stats">
+            <div class="pstat"><div class="pstat-val" style="color:#10B981">720</div><div class="pstat-lbl">Skor</div></div>
+            <div class="pstat"><div class="pstat-val">2</div><div class="pstat-lbl">Tugas Terbuka</div></div>
+            <div class="pstat"><div class="pstat-val">127</div><div class="pstat-lbl">Jamaah</div></div>
+          </div>
+        </div>
+
+        <!-- P4: Hotel -->
+        <div class="pillar-card p4" onclick="showPillarDetail(4)">
+          <div class="pillar-header">
+            <div class="pillar-icon" style="background:#FFFBEB;color:#F59E0B">🏨</div>
+            <div>
+              <div class="pillar-name">Hotel & Catering</div>
+              <div class="pillar-desc">Akomodasi & katering jamaah</div>
+            </div>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--gray-400);margin-bottom:4px">
+            <span>Progress</span><span style="font-weight:600;color:#F59E0B">65%</span>
+          </div>
+          <div class="progress-bar"><div class="progress-fill p4-fill" style="width:65%"></div></div>
+          <div class="pillar-stats">
+            <div class="pstat"><div class="pstat-val" style="color:#F59E0B">650</div><div class="pstat-lbl">Skor</div></div>
+            <div class="pstat"><div class="pstat-val">4</div><div class="pstat-lbl">Tugas Terbuka</div></div>
+            <div class="pstat"><div class="pstat-val">3</div><div class="pstat-lbl">Vendor</div></div>
+          </div>
+        </div>
+
+        <!-- P5: Tiket -->
+        <div class="pillar-card p5" onclick="showPillarDetail(5)">
+          <div class="pillar-header">
+            <div class="pillar-icon" style="background:#FEF2F2;color:#EF4444">✈️</div>
+            <div>
+              <div class="pillar-name">Tiket & Transportasi</div>
+              <div class="pillar-desc">Penerbangan, bus & transfer</div>
+            </div>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--gray-400);margin-bottom:4px">
+            <span>Progress</span><span style="font-weight:600;color:#EF4444">48%</span>
+          </div>
+          <div class="progress-bar"><div class="progress-fill p5-fill" style="width:48%"></div></div>
+          <div class="pillar-stats">
+            <div class="pstat"><div class="pstat-val" style="color:#EF4444">480</div><div class="pstat-lbl">Skor</div></div>
+            <div class="pstat"><div class="pstat-val">5</div><div class="pstat-lbl">Tugas Terbuka</div></div>
+            <div class="pstat"><div class="pstat-val">2</div><div class="pstat-lbl">Maskapai</div></div>
+          </div>
+        </div>
+
+        <!-- P6: Sistem -->
+        <div class="pillar-card p6" onclick="showPillarDetail(6)">
+          <div class="pillar-header">
+            <div class="pillar-icon" style="background:var(--gold-pale);color:var(--gold)">💻</div>
+            <div>
+              <div class="pillar-name">Sistem & Teknologi</div>
+              <div class="pillar-desc">Digitalisasi & otomasi bisnis</div>
+            </div>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--gray-400);margin-bottom:4px">
+            <span>Progress</span><span style="font-weight:600;color:var(--gold)">40%</span>
+          </div>
+          <div class="progress-bar"><div class="progress-fill p6-fill" style="width:40%"></div></div>
+          <div class="pillar-stats">
+            <div class="pstat"><div class="pstat-val" style="color:var(--gold)">400</div><div class="pstat-lbl">Skor</div></div>
+            <div class="pstat"><div class="pstat-val">7</div><div class="pstat-lbl">Tugas Terbuka</div></div>
+            <div class="pstat"><div class="pstat-val">2</div><div class="pstat-lbl">Tools Aktif</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- KNOWLEDGE BASE -->
+    <div class="page" id="page-knowledge">
+      <div class="search-bar">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="var(--gray-400)" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" placeholder="Cari artikel, panduan, regulasi...">
+      </div>
+      <div class="tabs">
+        <div class="tab active">Semua</div>
+        <div class="tab">Regulasi</div>
+        <div class="tab">Operasional</div>
+        <div class="tab">Pemasaran</div>
+        <div class="tab">Keuangan</div>
+      </div>
+      <div class="kb-grid">
+        <div class="kb-card">
+          <div class="kb-thumb" style="background:#EFF6FF">📋</div>
+          <div class="kb-body">
+            <div class="kb-cat">Regulasi</div>
+            <div class="kb-title">Panduan Lengkap Izin PPIU 2024</div>
+            <div class="kb-meta">8 min baca · Diperbarui 3 hari lalu</div>
+          </div>
+        </div>
+        <div class="kb-card">
+          <div class="kb-thumb" style="background:#ECFDF5">👥</div>
+          <div class="kb-body">
+            <div class="kb-cat">Operasional</div>
+            <div class="kb-title">SOP Penanganan Jamaah Sakit di Tanah Suci</div>
+            <div class="kb-meta">12 min baca · Diperbarui 1 minggu lalu</div>
+          </div>
+        </div>
+        <div class="kb-card">
+          <div class="kb-thumb" style="background:#FFFBEB">🏨</div>
+          <div class="kb-body">
+            <div class="kb-cat">Vendor</div>
+            <div class="kb-title">Cara Negosiasi Kontrak Hotel Makkah yang Menguntungkan</div>
+            <div class="kb-meta">15 min baca · Populer</div>
+          </div>
+        </div>
+        <div class="kb-card">
+          <div class="kb-thumb" style="background:#F5F3FF">✈️</div>
+          <div class="kb-body">
+            <div class="kb-cat">Operasional</div>
+            <div class="kb-title">Checklist Keberangkatan Jamaah Umrah</div>
+            <div class="kb-meta">5 min baca · Diunduh 1.2k kali</div>
+          </div>
+        </div>
+        <div class="kb-card">
+          <div class="kb-thumb" style="background:#FEF2F2">💰</div>
+          <div class="kb-body">
+            <div class="kb-cat">Keuangan</div>
+            <div class="kb-title">Strategi Pricing Paket Umrah yang Kompetitif</div>
+            <div class="kb-meta">10 min baca · Artikel teratas</div>
+          </div>
+        </div>
+        <div class="kb-card">
+          <div class="kb-thumb" style="background:var(--gold-pale)">📱</div>
+          <div class="kb-body">
+            <div class="kb-cat">Teknologi</div>
+            <div class="kb-title">Digitalisasi Pendaftaran Jamaah: Langkah demi Langkah</div>
+            <div class="kb-meta">20 min baca · Baru</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TEMPLATES -->
+    <div class="page" id="page-templates">
+      <div class="search-bar">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="var(--gray-400)" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" placeholder="Cari template...">
+      </div>
+      <div class="tabs">
+        <div class="tab active">Semua (24)</div>
+        <div class="tab">Dokumen Legal</div>
+        <div class="tab">Operasional</div>
+        <div class="tab">Pemasaran</div>
+        <div class="tab">Keuangan</div>
+      </div>
+      <div class="grid-3">
+        <div class="template-card">
+          <div class="template-icon">📄</div>
+          <div class="template-name">Kontrak Jamaah Umrah</div>
+          <div class="template-desc">Template resmi kontrak perjanjian jamaah sesuai regulasi Kemenag</div>
+          <button class="dl-btn">⬇ Download .docx</button>
+        </div>
+        <div class="template-card">
+          <div class="template-icon">📊</div>
+          <div class="template-name">Laporan Keuangan Bulanan</div>
+          <div class="template-desc">Spreadsheet otomatis untuk tracking pemasukan & pengeluaran tour</div>
+          <button class="dl-btn">⬇ Download .xlsx</button>
+        </div>
+        <div class="template-card">
+          <div class="template-icon">📋</div>
+          <div class="template-name">Checklist Keberangkatan</div>
+          <div class="template-desc">Daftar periksa lengkap H-7 hingga hari keberangkatan jamaah</div>
+          <button class="dl-btn">⬇ Download .pdf</button>
+        </div>
+        <div class="template-card">
+          <div class="template-icon">📝</div>
+          <div class="template-name">Surat Kuasa PPIU</div>
+          <div class="template-desc">Template surat kuasa resmi untuk pengurusan dokumen PPIU</div>
+          <button class="dl-btn">⬇ Download .docx</button>
+        </div>
+        <div class="template-card">
+          <div class="template-icon">📣</div>
+          <div class="template-name">Proposal Paket Umrah</div>
+          <div class="template-desc">Desain presentasi profesional untuk calon jamaah dan mitra</div>
+          <button class="dl-btn">⬇ Download .pptx</button>
+        </div>
+        <div class="template-card">
+          <div class="template-icon">🤝</div>
+          <div class="template-name">MOU Kerjasama Hotel</div>
+          <div class="template-desc">Memorandum of Understanding untuk negosiasi kontrak hotel Arab Saudi</div>
+          <button class="dl-btn">⬇ Download .docx</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- VENDOR DIRECTORY -->
+    <div class="page" id="page-vendor">
+      <div class="search-bar">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="var(--gray-400)" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" placeholder="Cari vendor, hotel, maskapai...">
+      </div>
+      <div class="tabs">
+        <div class="tab active">Semua</div>
+        <div class="tab">Hotel</div>
+        <div class="tab">Maskapai</div>
+        <div class="tab">Katering</div>
+        <div class="tab">Bus</div>
+        <div class="tab">Konsulat</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div class="vendor-card">
+          <div class="vendor-logo">🏨</div>
+          <div>
+            <div class="vendor-name">Pullman Zamzam Makkah</div>
+            <div class="vendor-cat">Hotel Bintang 5 · Makkah · 0m dari Masjidil Haram</div>
+          </div>
+          <div class="vendor-rating">⭐ 4.9 <span class="verified">Terverifikasi</span></div>
+        </div>
+        <div class="vendor-card">
+          <div class="vendor-logo">✈️</div>
+          <div>
+            <div class="vendor-name">Garuda Indonesia</div>
+            <div class="vendor-cat">Maskapai Penerbangan · Direct flight Jakarta–Jeddah</div>
+          </div>
+          <div class="vendor-rating">⭐ 4.7 <span class="verified">Mitra Resmi</span></div>
+        </div>
+        <div class="vendor-card">
+          <div class="vendor-logo">🍱</div>
+          <div>
+            <div class="vendor-name">Al-Barakah Catering</div>
+            <div class="vendor-cat">Katering Jamaah · Masakan Indonesia · Mekkah & Madinah</div>
+          </div>
+          <div class="vendor-rating">⭐ 4.8 <span class="verified">Terverifikasi</span></div>
+        </div>
+        <div class="vendor-card">
+          <div class="vendor-logo">🚌</div>
+          <div>
+            <div class="vendor-name">Haramain Transport</div>
+            <div class="vendor-cat">Bus Ziarah · Rute Makkah–Madinah–Jeddah</div>
+          </div>
+          <div class="vendor-rating">⭐ 4.6 <span class="verified">Terverifikasi</span></div>
+        </div>
+        <div class="vendor-card">
+          <div class="vendor-logo">🏨</div>
+          <div>
+            <div class="vendor-name">Hilton Madinah</div>
+            <div class="vendor-cat">Hotel Bintang 5 · Madinah · 200m dari Masjid Nabawi</div>
+          </div>
+          <div class="vendor-rating">⭐ 4.8 <span class="verified">Terverifikasi</span></div>
+        </div>
+        <div class="vendor-card">
+          <div class="vendor-logo">✈️</div>
+          <div>
+            <div class="vendor-name">Saudi Airlines</div>
+            <div class="vendor-cat">Maskapai Penerbangan · Multi rute ke Jeddah & Madinah</div>
+          </div>
+          <div class="vendor-rating">⭐ 4.5 <span class="verified">Mitra Resmi</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- COMMUNITY -->
+    <div class="page" id="page-community">
+      <div style="display:flex;gap:12px;margin-bottom:20px">
+        <button style="flex:1;padding:10px;background:linear-gradient(135deg,var(--navy),var(--navy-light));color:var(--white);border:none;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer">+ Buat Diskusi Baru</button>
+      </div>
+      <div class="tabs">
+        <div class="tab active">Semua Diskusi</div>
+        <div class="tab">Pertanyaan</div>
+        <div class="tab">Tips & Trick</div>
+        <div class="tab">Pengalaman</div>
+      </div>
+
+      <div class="post-card">
+        <div class="post-header">
+          <div class="post-avatar" style="background:#3B82F6">RA</div>
+          <div>
+            <div class="post-user">Rizky Aditya · Rizky Tour & Travel</div>
+            <div class="post-time">2 jam lalu · Surabaya</div>
+          </div>
+        </div>
+        <div class="post-body">Rekan-rekan, apakah ada yang punya pengalaman mengurus perpanjangan PPIU lewat sistem online? Saya dengar prosesnya sekarang bisa 30 hari lebih cepat jika dokumen sudah lengkap. Mohon sharingnya 🙏</div>
+        <div class="post-actions">
+          <div class="post-act">👍 14 Suka</div>
+          <div class="post-act">💬 8 Komentar</div>
+          <div class="post-act">🔖 Simpan</div>
+        </div>
+      </div>
+
+      <div class="post-card">
+        <div class="post-header">
+          <div class="post-avatar" style="background:#10B981">NF</div>
+          <div>
+            <div class="post-user">Nur Fatimah · Al-Hikmah Travel</div>
+            <div class="post-time">5 jam lalu · Bandung</div>
+          </div>
+        </div>
+        <div class="post-body">Tips dari saya: selalu gunakan SOP tertulis untuk setiap proses jamaah, mulai dari pendaftaran sampai kepulangan. Sejak kami implementasikan, komplain berkurang 60% dan rating kepuasan jamaah naik drastis! Template SOP tersedia di menu Templates 📋</div>
+        <div class="post-actions">
+          <div class="post-act">👍 42 Suka</div>
+          <div class="post-act">💬 23 Komentar</div>
+          <div class="post-act">🔖 Simpan</div>
+        </div>
+      </div>
+
+      <div class="post-card">
+        <div class="post-header">
+          <div class="post-avatar" style="background:#8B5CF6">HM</div>
+          <div>
+            <div class="post-user">Hasan Mustafa · Mustafa Travel</div>
+            <div class="post-time">1 hari lalu · Jakarta</div>
+          </div>
+        </div>
+        <div class="post-body">Alhamdulillah, setelah 4 bulan menggunakan HUDITA, skor readiness kami naik dari 380 menjadi 810! Yang paling berpengaruh adalah pilar Jamaah Management & Legalitas. Bagi yang baru mulai, fokus dulu di dua pilar itu 💪</div>
+        <div class="post-actions">
+          <div class="post-act">👍 87 Suka</div>
+          <div class="post-act">💬 45 Komentar</div>
+          <div class="post-act">🔖 Simpan</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CONSULTATION -->
+    <div class="page" id="page-consultation">
+      <div style="background:var(--gold-pale);border:1px solid rgba(201,168,76,0.2);border-radius:var(--radius);padding:20px;margin-bottom:24px;display:flex;align-items:center;gap:16px">
+        <div style="font-size:36px">🕌</div>
+        <div>
+          <div style="font-size:15px;font-weight:700;color:var(--navy)">Konsultasi dengan Pakar Umrah</div>
+          <div style="font-size:13px;color:var(--gray-600);margin-top:2px">Dapatkan arahan langsung dari praktisi berpengalaman untuk mempercepat pertumbuhan bisnis Anda.</div>
+        </div>
+      </div>
+
+      <div class="tabs">
+        <div class="tab active">Semua Konsultan</div>
+        <div class="tab">Legalitas</div>
+        <div class="tab">Operasional</div>
+        <div class="tab">Keuangan</div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div class="consult-card">
+          <div class="expert-avatar" style="background:#EFF6FF;font-size:28px">👨‍⚖️</div>
+          <div style="flex:1">
+            <div class="expert-name">Dr. Ahmad Fauzi, S.H., M.H.</div>
+            <div class="expert-title">Spesialis Hukum Perjalanan Ibadah · 15 tahun pengalaman</div>
+            <div style="display:flex;gap:6px;flex-wrap:wrap">
+              <div style="font-size:10px;background:#EFF6FF;color:#3B82F6;padding:2px 8px;border-radius:10px;font-weight:600">PPIU</div>
+              <div style="font-size:10px;background:#EFF6FF;color:#3B82F6;padding:2px 8px;border-radius:10px;font-weight:600">Regulasi Kemenag</div>
+              <div style="font-size:10px;background:#EFF6FF;color:#3B82F6;padding:2px 8px;border-radius:10px;font-weight:600">Kontrak</div>
+            </div>
+            <div style="font-size:12px;color:var(--gray-400);margin-top:6px">⭐ 4.9 · 124 sesi selesai · Tersedia Senin-Jumat</div>
+            <button class="book-btn">📅 Booking Konsultasi</button>
+          </div>
+          <div style="text-align:right;flex-shrink:0">
+            <div style="font-size:16px;font-weight:700;color:var(--navy)">Rp 350k</div>
+            <div style="font-size:11px;color:var(--gray-400)">/sesi 60 menit</div>
+          </div>
+        </div>
+
+        <div class="consult-card">
+          <div class="expert-avatar" style="background:#ECFDF5;font-size:28px">👩‍💼</div>
+          <div style="flex:1">
+            <div class="expert-name">Hj. Siti Aminah, M.M.</div>
+            <div class="expert-title">Direktur Operasional Umrah · 20 tahun pengalaman</div>
+            <div style="display:flex;gap:6px;flex-wrap:wrap">
+              <div style="font-size:10px;background:#ECFDF5;color:#10B981;padding:2px 8px;border-radius:10px;font-weight:600">SOP</div>
+              <div style="font-size:10px;background:#ECFDF5;color:#10B981;padding:2px 8px;border-radius:10px;font-weight:600">Manajemen Jamaah</div>
+              <div style="font-size:10px;background:#ECFDF5;color:#10B981;padding:2px 8px;border-radius:10px;font-weight:600">Tour Leader</div>
+            </div>
+            <div style="font-size:12px;color:var(--gray-400);margin-top:6px">⭐ 4.8 · 256 sesi selesai · Tersedia setiap hari</div>
+            <button class="book-btn">📅 Booking Konsultasi</button>
+          </div>
+          <div style="text-align:right;flex-shrink:0">
+            <div style="font-size:16px;font-weight:700;color:var(--navy)">Rp 280k</div>
+            <div style="font-size:11px;color:var(--gray-400)">/sesi 60 menit</div>
+          </div>
+        </div>
+
+        <div class="consult-card">
+          <div class="expert-avatar" style="background:#FFFBEB;font-size:28px">👨‍💰</div>
+          <div style="flex:1">
+            <div class="expert-name">Bapak Irfan Santoso, CFA</div>
+            <div class="expert-title">Konsultan Keuangan & Pricing Paket Umrah</div>
+            <div style="display:flex;gap:6px;flex-wrap:wrap">
+              <div style="font-size:10px;background:#FFFBEB;color:#F59E0B;padding:2px 8px;border-radius:10px;font-weight:600">Pricing</div>
+              <div style="font-size:10px;background:#FFFBEB;color:#F59E0B;padding:2px 8px;border-radius:10px;font-weight:600">Cash Flow</div>
+              <div style="font-size:10px;background:#FFFBEB;color:#F59E0B;padding:2px 8px;border-radius:10px;font-weight:600">Laporan Keuangan</div>
+            </div>
+            <div style="font-size:12px;color:var(--gray-400);margin-top:6px">⭐ 4.7 · 89 sesi selesai · Tersedia Selasa & Kamis</div>
+            <button class="book-btn">📅 Booking Konsultasi</button>
+          </div>
+          <div style="text-align:right;flex-shrink:0">
+            <div style="font-size:16px;font-weight:700;color:var(--navy)">Rp 420k</div>
+            <div style="font-size:11px;color:var(--gray-400)">/sesi 60 menit</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SETTINGS -->
+    <div class="page" id="page-settings">
+      <div class="grid-2">
+        <div>
+          <div class="section-title" style="margin-bottom:16px">Preferensi Aplikasi</div>
+          <div class="card">
+            <div class="setting-row">
+              <div class="setting-label">
+                <div class="setting-title">Mode Gelap</div>
+                <div class="setting-desc">Tampilan layar lebih nyaman di malam hari</div>
+              </div>
+              <div class="toggle" id="darkToggle" onclick="toggleDark()"></div>
+            </div>
+            <div class="setting-row">
+              <div class="setting-label">
+                <div class="setting-title">Notifikasi Push</div>
+                <div class="setting-desc">Pengingat tugas dan deadline penting</div>
+              </div>
+              <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+            </div>
+            <div class="setting-row">
+              <div class="setting-label">
+                <div class="setting-title">Laporan Mingguan Email</div>
+                <div class="setting-desc">Ringkasan progress dikirim setiap Senin</div>
+              </div>
+              <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+            </div>
+            <div class="setting-row">
+              <div class="setting-label">
+                <div class="setting-title">Bahasa Antarmuka</div>
+                <div class="setting-desc">Pilih bahasa tampilan aplikasi</div>
+              </div>
+              <select class="lang-select" style="border-radius:8px">
+                <option>🇮🇩 Bahasa Indonesia</option>
+                <option>🇬🇧 English</option>
+                <option>🇲🇾 Melayu</option>
+                <option>☕ Jawa</option>
+                <option>🌿 Sunda</option>
+                <option>🕌 العربية</option>
+                <option>🇨🇳 中文</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="section-title" style="margin:20px 0 16px">Keamanan</div>
+          <div class="card">
+            <div class="setting-row">
+              <div class="setting-label">
+                <div class="setting-title">Autentikasi Dua Faktor</div>
+                <div class="setting-desc">Keamanan tambahan untuk akun Anda</div>
+              </div>
+              <div class="toggle" onclick="this.classList.toggle('on')"></div>
+            </div>
+            <div class="setting-row">
+              <div class="setting-label">
+                <div class="setting-title">Login Biometrik</div>
+                <div class="setting-desc">Gunakan sidik jari atau Face ID</div>
+              </div>
+              <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div class="section-title" style="margin-bottom:16px">Profil Agency</div>
+          <div class="card">
+            <div style="text-align:center;padding:16px 0;border-bottom:1px solid var(--gray-100);margin-bottom:16px">
+              <div style="width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--gold-light));display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:700;color:var(--navy);margin:0 auto 12px">AU</div>
+              <div style="font-size:16px;font-weight:700;color:var(--navy)">Al-Amin Tour & Travel</div>
+              <div style="font-size:12px;color:var(--gray-400)">Akun Starter · Bergabung Maret 2024</div>
+            </div>
+            <div class="setting-row">
+              <div class="setting-label"><div class="setting-title">Nama Agency</div></div>
+              <div style="font-size:13px;color:var(--gray-600)">Al-Amin Tour & Travel</div>
+            </div>
+            <div class="setting-row">
+              <div class="setting-label"><div class="setting-title">NPWP</div></div>
+              <div style="font-size:13px;color:var(--gray-600)">12.345.678.9-000.000</div>
+            </div>
+            <div class="setting-row">
+              <div class="setting-label"><div class="setting-title">No. Izin PPIU</div></div>
+              <div style="font-size:13px;color:var(--green);font-weight:600">D.1234/2024 ✓</div>
+            </div>
+            <button style="width:100%;margin-top:12px;padding:10px;border-radius:8px;border:1px solid var(--gold);color:var(--gold);background:transparent;font-size:13px;font-weight:600;cursor:pointer;transition:all 0.2s" onmouseover="this.style.background='var(--gold)';this.style.color='var(--navy)'" onmouseout="this.style.background='transparent';this.style.color='var(--gold)'">Edit Profil Agency</button>
+          </div>
+
+          <div class="section-title" style="margin:20px 0 16px">Paket & Billing</div>
+          <div class="card" style="background:linear-gradient(135deg,var(--navy),var(--navy-light));color:var(--white);border:none">
+            <div style="font-size:11px;letter-spacing:2px;color:rgba(201,168,76,0.7);text-transform:uppercase;margin-bottom:4px">Paket Aktif</div>
+            <div style="font-size:22px;font-weight:700;color:var(--gold);font-family:'Playfair Display',serif">Starter</div>
+            <div style="font-size:12px;color:rgba(255,255,255,0.5);margin-bottom:16px">Diperbarui 1 Maret 2024</div>
+            <div style="font-size:12px;color:rgba(255,255,255,0.7);margin-bottom:6px">✓ 6 Pilar Blueprint</div>
+            <div style="font-size:12px;color:rgba(255,255,255,0.7);margin-bottom:6px">✓ 50 Template</div>
+            <div style="font-size:12px;color:rgba(255,255,255,0.7);margin-bottom:16px">✓ Community Access</div>
+            <button style="padding:8px 20px;border-radius:8px;background:var(--gold);color:var(--navy);font-size:13px;font-weight:700;border:none;cursor:pointer">Upgrade ke Pro →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- end content -->
+</div><!-- end main -->
+
+<!-- MOBILE BOTTOM NAV -->
+<nav class="mobile-nav">
+  <div class="mobile-nav-items">
+    <div class="mobile-nav-item active" onclick="navigate('dashboard',this);updateMobileNav(this)">
+      <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      <span>Dashboard</span>
+    </div>
+    <div class="mobile-nav-item" onclick="navigate('blueprint',this);updateMobileNav(this)">
+      <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+      <span>Blueprint</span>
+    </div>
+    <div class="mobile-nav-item" onclick="navigate('knowledge',this);updateMobileNav(this)">
+      <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+      <span>Artikel</span>
+    </div>
+    <div class="mobile-nav-item" onclick="navigate('community',this);updateMobileNav(this)">
+      <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      <span>Forum</span>
+    </div>
+    <div class="mobile-nav-item" onclick="navigate('settings',this);updateMobileNav(this)">
+      <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      <span>Pengaturan</span>
+    </div>
+  </div>
+</nav>
+
+</div><!-- end app -->
+
+<script>
+// Loading screen
+window.addEventListener('load', () => {
+  setTimeout(() => {
+    const l = document.getElementById('loading');
+    l.style.opacity = '0';
+    setTimeout(() => {
+      l.style.display = 'none';
+      document.getElementById('app').style.display = 'flex';
+    }, 600);
+  }, 2400);
+});
+
+// Navigation
+const pageTitles = {
+  dashboard: 'Dashboard',
+  blueprint: 'Blueprint 6 Pilar',
+  knowledge: 'Knowledge Base',
+  templates: 'Templates',
+  vendor: 'Vendor Directory',
+  community: 'Community',
+  consultation: 'Consultation',
+  settings: 'Pengaturan'
+};
+
+function navigate(page, el) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + page).classList.add('active');
+  document.getElementById('pageTitle').textContent = pageTitles[page] || page;
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  if (el && el.classList && el.classList.contains('nav-item')) el.classList.add('active');
+
+  // Close sidebar on mobile
+  if (window.innerWidth <= 768) {
+    document.getElementById('sidebar').classList.remove('open');
+  }
+}
+
+function toggleSidebar() {
+  const sb = document.getElementById('sidebar');
+  if (window.innerWidth <= 768) {
+    sb.classList.toggle('open');
+  } else {
+    sb.classList.toggle('collapsed');
+    document.getElementById('main').classList.toggle('expanded');
+  }
+}
+
+function toggleDark() {
+  document.body.classList.toggle('dark');
+  const dt = document.getElementById('darkToggle');
+  if (dt) dt.classList.toggle('on');
+}
+
+function changeLang(lang) {
+  // Placeholder for i18n
+  const labels = {
+    id: 'Dashboard',
+    en: 'Dashboard',
+    ms: 'Papan Pemuka',
+    jv: 'Panggenan Utama',
+    su: 'Dasbor',
+    ar: 'لوحة التحكم',
+    zh: '仪表板'
+  };
+}
+
+function updateMobileNav(el) {
+  document.querySelectorAll('.mobile-nav-item').forEach(n => n.classList.remove('active'));
+  el.classList.add('active');
+}
+
+function showPillarDetail(n) {
+  const names = ['', 'Legalitas', 'Tour Leader', 'Jamaah Management', 'Hotel & Catering', 'Tiket & Transportasi', 'Sistem & Teknologi'];
+  // Simple alert for prototype
+  alert('📋 Membuka detail pilar: ' + names[n] + '\n\n(Dalam aplikasi lengkap, halaman detail pilar akan menampilkan daftar tugas, checklist, dokumen, dan progress tracking lengkap.)');
+}
+
+// Tab switching
+document.querySelectorAll('.tabs').forEach(tabGroup => {
+  tabGroup.querySelectorAll('.tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      tabGroup.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+    });
+  });
+});
+
+// Task check toggle
+document.querySelectorAll('.task-check').forEach(check => {
+  check.addEventListener('click', function() {
+    this.classList.toggle('done');
+    if (this.classList.contains('done')) {
+      this.textContent = '✓';
+      this.nextElementSibling?.nextElementSibling && (this.nextElementSibling.nextElementSibling.className = 'task-tag tag-done');
+      if (this.nextElementSibling?.nextElementSibling) this.nextElementSibling.nextElementSibling.textContent = 'Selesai';
+    } else {
+      this.textContent = '';
+    }
+  });
+});
+
+// Close sidebar when clicking outside on mobile
+document.getElementById('main').addEventListener('click', () => {
+  if (window.innerWidth <= 768) {
+    document.getElementById('sidebar').classList.remove('open');
+  }
+});
+</script>
+</body>
+</html>
