@@ -157,7 +157,56 @@ body { font-family: 'Inter', sans-serif; background: var(--gray-50); color: var(
 .dark .card-value { color: var(--gold-light); }
 
 /* GRID */
-.grid-4 { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; }
+.grid-6 { display: grid; grid-template-columns: repeat(6,1fr); gap: 16px; }
+@media (max-width: 1200px) { .grid-6 { grid-template-columns: repeat(3,1fr); } }
+@media (max-width: 768px)  { .grid-6 { grid-template-columns: repeat(2,1fr); } }
+@media (max-width: 480px)  { .grid-6 { grid-template-columns: 1fr; } }
+
+/* ── HUDITA ADVISOR ── */
+.advisor-card {
+  background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%);
+  border-radius: var(--radius-lg); padding: 22px 24px; color: #fff;
+  position: relative; overflow: hidden; margin-bottom: 24px;
+}
+.advisor-card::before {
+  content: ''; position: absolute; right: -30px; top: -30px;
+  width: 160px; height: 160px; border-radius: 50%;
+  background: rgba(201,168,76,.07); pointer-events: none;
+}
+.advisor-header { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
+.advisor-icon { font-size: 26px; }
+.advisor-brand { font-family: 'Playfair Display', serif; font-size: 15px; color: var(--gold); letter-spacing: 1px; }
+.advisor-tagline { font-size: 11px; color: rgba(255,255,255,.4); margin-top: 1px; }
+.advisor-confidence {
+  margin-left: auto; display: flex; align-items: center; gap: 6px;
+  font-size: 11px; font-weight: 600; letter-spacing: .5px;
+}
+.conf-dot { width: 8px; height: 8px; border-radius: 50%; }
+.conf-low    { background: #EF4444; }
+.conf-medium { background: #F59E0B; }
+.conf-high   { background: #10B981; }
+.advisor-body { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
+@media (max-width: 768px) { .advisor-body { grid-template-columns: 1fr; } }
+.adv-block { background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.1); border-radius: 10px; padding: 14px 16px; }
+.adv-block-label { font-size: 9px; letter-spacing: 2px; color: rgba(201,168,76,.6); text-transform: uppercase; margin-bottom: 6px; }
+.adv-block-value { font-size: 14px; font-weight: 700; color: #fff; line-height: 1.4; }
+.adv-block-sub { font-size: 11px; color: rgba(255,255,255,.5); margin-top: 4px; line-height: 1.4; }
+.adv-priority-foundation { color: #F87171; }
+.adv-priority-growth     { color: #FBBF24; }
+.adv-priority-expansion  { color: #34D399; }
+.adv-action-btn {
+  margin-top: 14px; display: inline-flex; align-items: center; gap: 6px;
+  padding: 8px 16px; background: var(--gold); color: var(--navy);
+  border: none; border-radius: 8px; font-size: 12px; font-weight: 700;
+  cursor: pointer; transition: all .2s;
+}
+.adv-action-btn:hover { background: var(--gold-light); transform: translateY(-1px); }
+.adv-weakest { display: flex; gap: 8px; flex-direction: column; }
+.adv-pillar-row { display: flex; align-items: center; gap: 8px; font-size: 11px; }
+.adv-pillar-name { width: 70px; color: rgba(255,255,255,.6); flex-shrink: 0; }
+.adv-pillar-bar { flex: 1; height: 4px; background: rgba(255,255,255,.1); border-radius: 4px; overflow: hidden; }
+.adv-pillar-fill { height: 100%; border-radius: 4px; transition: width .6s ease; }
+.adv-pillar-pct { width: 28px; text-align: right; color: rgba(255,255,255,.5); flex-shrink: 0; }
 .grid-3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; }
 .grid-2 { display: grid; grid-template-columns: repeat(2,1fr); gap: 16px; }
 .col-span-2 { grid-column: span 2; }
@@ -678,7 +727,7 @@ body { font-family: 'Inter', sans-serif; background: var(--gray-50); color: var(
       </div>
 
       <!-- KPI Row -->
-      <div class="grid-4" style="margin-bottom:20px">
+      <div class="grid-6" style="margin-bottom:20px">
         <div class="card">
           <div class="card-title">Travel Readiness Score</div>
           <div class="score-ring-wrap">
@@ -742,6 +791,35 @@ body { font-family: 'Inter', sans-serif; background: var(--gray-50); color: var(
             <div style="width:28px;height:28px;border-radius:6px;background:#FEF2F2;display:flex;align-items:center;justify-content:center;font-size:14px">✈️</div>
             <div style="width:28px;height:28px;border-radius:6px;background:var(--gold-pale);display:flex;align-items:center;justify-content:center;font-size:14px">💻</div>
           </div>
+        </div>
+
+        <!-- XP / LEVEL CARD -->
+        <div class="card" id="xpCard">
+          <div class="card-title">XP &amp; Level</div>
+          <div style="display:flex;align-items:baseline;gap:6px;margin-bottom:2px">
+            <div class="card-value" id="xpLevelLabel" style="font-size:22px">Lv 1</div>
+            <div id="xpTotal" style="font-size:13px;font-weight:600;color:var(--gold)">0 XP</div>
+          </div>
+          <div style="font-size:11px;color:var(--gray-400);margin-bottom:8px" id="xpNextLabel">50 XP ke Level 2</div>
+          <div class="progress-bar" style="height:8px;border-radius:6px">
+            <div id="xpBar" class="progress-fill" style="width:0%;background:linear-gradient(90deg,var(--gold),var(--gold-light));border-radius:6px;transition:width .6s ease"></div>
+          </div>
+          <div style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap" id="xpPills">
+            <span style="font-size:10px;background:var(--gold-pale);color:var(--amber);padding:2px 7px;border-radius:10px;font-weight:600">Task +10</span>
+            <span style="font-size:10px;background:var(--gold-pale);color:var(--amber);padding:2px 7px;border-radius:10px;font-weight:600">Tpl +5</span>
+            <span style="font-size:10px;background:var(--gold-pale);color:var(--amber);padding:2px 7px;border-radius:10px;font-weight:600">Vendor +3</span>
+            <span style="font-size:10px;background:var(--gold-pale);color:var(--amber);padding:2px 7px;border-radius:10px;font-weight:600">Consult +20</span>
+          </div>
+        </div>
+
+        <!-- ACHIEVEMENTS CARD -->
+        <div class="card" id="achCard">
+          <div class="card-title">Achievements</div>
+          <div style="display:flex;align-items:baseline;gap:6px;margin-bottom:10px">
+            <div class="card-value" id="achCount" style="font-size:28px">0</div>
+            <div style="font-size:13px;color:var(--gray-400);font-weight:600">/ 6</div>
+          </div>
+          <div id="achList" style="display:flex;flex-direction:column;gap:6px"></div>
         </div>
       </div>
 
@@ -834,7 +912,8 @@ body { font-family: 'Inter', sans-serif; background: var(--gray-50); color: var(
         <div class="section-title" data-i18n="dash.recent_achievements">Pencapaian Terakhir</div>
         <div class="section-link">Lihat semua →</div>
       </div>
-      <div class="grid-3">
+      <div class="grid-3" id="milestoneGrid">
+        <!-- Static seeds; dynamic achievements prepend here -->
         <div class="milestone-card">
           <div class="milestone-icon">🏆</div>
           <div>
@@ -856,6 +935,49 @@ body { font-family: 'Inter', sans-serif; background: var(--gray-50); color: var(
             <div class="milestone-desc">Kontrak Pullman Zamzam ditandatangani · 2 minggu lalu</div>
           </div>
         </div>
+      </div>
+
+      <!-- HUDITA ADVISOR CARD -->
+      <div class="advisor-card" id="advisorCard">
+        <div class="advisor-header">
+          <div class="advisor-icon">🧠</div>
+          <div>
+            <div class="advisor-brand">HUDITA Advisor</div>
+            <div class="advisor-tagline">Smart Readiness Analysis · Realtime</div>
+          </div>
+          <div class="advisor-confidence" id="advConfidence">
+            <div class="conf-dot conf-low" id="advConfDot"></div>
+            <span id="advConfLabel">Low Confidence</span>
+          </div>
+        </div>
+        <div class="advisor-body">
+          <!-- Priority -->
+          <div class="adv-block">
+            <div class="adv-block-label">Priority Area</div>
+            <div class="adv-block-value" id="advPriority">Foundation</div>
+            <div class="adv-block-sub" id="advPrioritySub">Bangun fondasi bisnis yang kuat sebelum berkembang.</div>
+          </div>
+          <!-- Recommendation -->
+          <div class="adv-block">
+            <div class="adv-block-label">Recommendation</div>
+            <div class="adv-block-value" id="advRec" style="font-size:12px;line-height:1.6">Complete core operational tasks</div>
+            <button class="adv-action-btn" id="advActionBtn">→ Mulai</button>
+          </div>
+          <!-- Weakest Pillar -->
+          <div class="adv-block">
+            <div class="adv-block-label">Analisis Pilar</div>
+            <div class="adv-block-sub" id="advWeakLabel" style="color:rgba(255,255,255,.7);font-size:12px;font-weight:600;margin-bottom:8px">Pilar terlemah: Sistem & Teknologi</div>
+            <div class="adv-weakest" id="advPillarBars"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RECENT ACTIVITY PANEL -->
+      <div class="section-header" style="margin-top:24px">
+        <div class="section-title">Aktivitas Terkini</div>
+      </div>
+      <div class="card" id="activityPanel" style="padding:4px 20px">
+        <div class="activity-empty" style="padding:16px 0;font-size:13px;color:var(--gray-400);text-align:center">Belum ada aktivitas. Mulai dengan menyelesaikan tugas.</div>
       </div>
     </div>
 
@@ -1652,9 +1774,16 @@ function updateMobileNav(el) {
 }
 
 function showPillarDetail(n) {
-  const names = ['', 'Legalitas', 'Tour Leader', 'Jamaah Management', 'Hotel & Catering', 'Tiket & Transportasi', 'Sistem & Teknologi'];
-  // Simple alert for prototype
-  alert('📋 Membuka detail pilar: ' + names[n] + '\n\n(Dalam aplikasi lengkap, halaman detail pilar akan menampilkan daftar tugas, checklist, dokumen, dan progress tracking lengkap.)');
+  const p = pillarData[n]; if (!p) return;
+  openModal('📋 ' + p.name,
+    `<div style="margin-bottom:14px">
+      <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--gray-400);margin-bottom:6px"><span>Progress</span><span style="font-weight:700;color:${p.color}">${p.pct}%</span></div>
+      <div style="height:8px;background:var(--gray-100);border-radius:8px;overflow:hidden"><div style="height:100%;width:${p.pct}%;background:${p.color};border-radius:8px;transition:width .5s"></div></div>
+    </div>
+    <p style="margin-bottom:6px"><strong>${p.tasks}</strong></p>
+    <p>${p.detail}</p>
+    <button class="modal-btn" onclick="showToast('Blueprint pilar dibuka');document.getElementById('modalOverlay').classList.remove('open')">Buka Blueprint →</button>`
+  );
 }
 
 // Tab switching
@@ -1667,17 +1796,90 @@ document.querySelectorAll('.tabs').forEach(tabGroup => {
   });
 });
 
-// Task check toggle
+// ── ACTIVITY LOG ──────────────────────────────────────────
+const activityLog = [];
+function addActivity(icon, text) {
+  activityLog.unshift({ icon, text, time: new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) });
+  if (activityLog.length > 5) activityLog.pop();
+  const panel = document.getElementById('activityPanel');
+  if (!panel) return;
+  panel.innerHTML = activityLog.map((a, i) =>
+    `<div style="display:flex;align-items:center;gap:10px;padding:10px 0;${i < activityLog.length-1 ? 'border-bottom:1px solid var(--gray-100)' : ''};font-size:13px">
+      <span style="font-size:16px;flex-shrink:0">${a.icon}</span>
+      <span style="flex:1;color:var(--gray-800)">${a.text}</span>
+      <span style="font-size:11px;color:var(--gray-400);flex-shrink:0">${a.time}</span>
+    </div>`).join('');
+}
+
+// ── SCORE + PROGRESS ANIMATION ────────────────────────────
+let currentScore = 762;
+function animateNum(el, to) {
+  const from = parseInt(el.textContent) || 0, steps = 20, diff = to - from;
+  let i = 0;
+  const t = setInterval(() => { el.textContent = Math.round(from + diff * ++i / steps); if (i >= steps) clearInterval(t); }, 30);
+}
+function setScore(delta, milestone) {
+  currentScore = Math.min(currentScore + delta, 1000);
+  const numEl = document.querySelector('.score-ring-num .num');
+  if (numEl) { animateNum(numEl, currentScore); numEl.style.transition = 'color .3s'; numEl.style.color = 'var(--gold)'; setTimeout(() => numEl.style.color = '', 900); }
+  const circleEl = document.querySelector('.score-ring circle:last-of-type');
+  if (circleEl) { circleEl.style.transition = 'stroke-dashoffset .8s ease'; circleEl.style.strokeDashoffset = Math.max(0, 263.9 - 263.9 * (currentScore / 1000)); }
+  if (milestone) setTimeout(() => showToast('🏆 ' + milestone), 400);
+}
+function bumpScore() { setScore(5); }
+function setBar(fill, newPct) {
+  fill.style.transition = 'width .6s ease';
+  fill.style.width = newPct + '%';
+  const label = fill.closest('.progress-bar')?.previousElementSibling?.querySelector('span:last-child');
+  if (label) setTimeout(() => { animateNum(label, newPct); label.textContent.includes('%') || (label.textContent = newPct + '%'); }, 50);
+}
+
+// ── PILLAR DATA ────────────────────────────────────────────
+const pillarData = {
+  1: { name:'Legalitas', pct:88, color:'#3B82F6', cls:'p1-fill', tasks:'1 tugas terbuka', detail:'PPIU aktif · Dokumen legal 88% lengkap · Sertifikat akan diperbarui.', vendorPillar:null },
+  2: { name:'Tour Leader', pct:55, color:'#8B5CF6', cls:'p2-fill', tasks:'3 tugas terbuka', detail:'2 dari 4 TL aktif · Sertifikasi tersisa untuk 2 kandidat.', vendorPillar:null },
+  3: { name:'Jamaah Management', pct:72, color:'#10B981', cls:'p3-fill', tasks:'2 tugas terbuka', detail:'127 jamaah terdaftar · CRM 72% terkonfigurasi.', vendorPillar:null },
+  4: { name:'Hotel & Catering', pct:65, color:'#F59E0B', cls:'p4-fill', tasks:'4 tugas terbuka', detail:'3 vendor aktif · Negosiasi rate 2025 masih berlangsung.', vendorPillar:4 },
+  5: { name:'Tiket & Transportasi', pct:48, color:'#EF4444', cls:'p5-fill', tasks:'5 tugas terbuka', detail:'2 maskapai terhubung · Rute transit belum dioptimasi.', vendorPillar:5 },
+  6: { name:'Sistem & Teknologi', pct:40, color:'var(--gold)', cls:'p6-fill', tasks:'7 tugas terbuka', detail:'Website aktif · CRM & payment gateway belum terintegrasi penuh.', vendorPillar:null }
+};
+// vendor → pillar mapping: hotel/catering=4, airlines=5, bus=5
+const vendorPillarMap = { '🏨':4, '✈️':5, '🚌':5, '🍱':4 };
+
+// ── PILLAR HIGHLIGHT (Blueprint → Dashboard) ───────────────
+function highlightPillarScore(n) {
+  const cards = document.querySelectorAll('.pillar-card');
+  cards.forEach(c => c.style.boxShadow = '');
+  const target = cards[n - 1];
+  if (target) { target.style.boxShadow = '0 0 0 2px ' + pillarData[n].color + ', 0 4px 16px rgba(0,0,0,.12)'; setTimeout(() => target.style.boxShadow = '', 2000); }
+}
+
+// ── RECOMMENDATION ROTATION ───────────────────────────────
+const recWrapper = document.querySelector('#page-dashboard [style*="flex-direction:column"][style*="gap:10px"]');
+if (recWrapper) {
+  const cards = [...recWrapper.children];
+  let cur = 0;
+  setInterval(() => {
+    cards.forEach(c => { c.style.transition = 'opacity .4s'; c.style.opacity = '0'; });
+    setTimeout(() => {
+      cur = (cur + 1) % cards.length;
+      const order = [cur, (cur+1)%cards.length, (cur+2)%cards.length];
+      order.forEach((idx, pos) => { recWrapper.appendChild(cards[idx]); cards[idx].style.opacity = '1'; });
+    }, 400);
+  }, 20000);
+}
+
+// ── TASK CHECK TOGGLE ─────────────────────────────────────
 document.querySelectorAll('.task-check').forEach(check => {
   check.addEventListener('click', function() {
-    this.classList.toggle('done');
-    if (this.classList.contains('done')) {
-      this.textContent = '✓';
-      this.nextElementSibling?.nextElementSibling && (this.nextElementSibling.nextElementSibling.className = 'task-tag tag-done');
-      if (this.nextElementSibling?.nextElementSibling) this.nextElementSibling.nextElementSibling.textContent = 'Selesai';
-    } else {
-      this.textContent = '';
-    }
+    if (this.classList.contains('done')) { this.classList.remove('done'); this.textContent = ''; return; }
+    this.classList.add('done'); this.textContent = '✓';
+    const tagEl = this.nextElementSibling?.nextElementSibling;
+    if (tagEl) { tagEl.className = 'task-tag tag-done'; tagEl.textContent = 'Selesai'; }
+    const title = this.nextElementSibling?.querySelector('.task-title')?.textContent || 'Tugas';
+    showToast('✅ Task completed');
+    bumpScore();
+    addActivity('✅', title + ' — selesai');
   });
 });
 
@@ -1708,42 +1910,108 @@ function showToast(msg) {
 }
 
 document.addEventListener('click', function(e) {
-  if (e.target.closest('.dl-btn')) { showToast('Demo download started'); return; }
+  // ── Template download → +2 score ──────────────────────
+  if (e.target.closest('.dl-btn')) {
+    showToast('⬇ Download dimulai');
+    setScore(2);
+    const name = e.target.closest('.template-card')?.querySelector('.template-name')?.textContent || 'Template';
+    addActivity('⬇', name + ' — didownload (+2 skor)');
+    return;
+  }
 
+  // ── Recommendation button ──────────────────────────────
   const actBtn = e.target.closest('.action-btn');
   if (actBtn) {
     const card = actBtn.closest('.action-card');
-    openModal(card.querySelector('.action-title').textContent, '<p>' + card.querySelector('.action-desc').textContent + '</p>');
+    const title = card.querySelector('.action-title').textContent;
+    openModal(title, '<p>' + card.querySelector('.action-desc').textContent + '</p><button class="modal-btn" onclick="showToast(\'✅ Tindakan dimulai\');document.getElementById(\'modalOverlay\').classList.remove(\'open\')">Mulai →</button>');
+    showToast('✅ Rekomendasi dibuka');
+    addActivity('💡', title + ' — rekomendasi diambil');
     return;
   }
 
-  if (e.target.closest('.toggle')) { showToast('Settings updated successfully'); return; }
+  if (e.target.closest('.toggle') && !e.target.closest('#darkToggle')) { showToast('Settings updated successfully'); return; }
 
+  // ── Knowledge base article ─────────────────────────────
   const kb = e.target.closest('.kb-card');
   if (kb) {
-    openModal(kb.querySelector('.kb-title').textContent,
-      '<p>' + kb.querySelector('.kb-meta').textContent + '</p><p style="margin-top:10px">Pratinjau singkat: artikel ini membahas langkah praktis, checklist, dan contoh dokumen yang bisa langsung diterapkan oleh agency Anda.</p>');
+    const title = kb.querySelector('.kb-title').textContent;
+    openModal(title, '<p>' + kb.querySelector('.kb-meta').textContent + '</p><p style="margin-top:10px">Pratinjau singkat: artikel ini membahas langkah praktis, checklist, dan contoh dokumen yang bisa langsung diterapkan.</p>');
+    addActivity('📚', title + ' — artikel dibaca');
     return;
   }
 
+  // ── Template card preview ──────────────────────────────
   const tpl = e.target.closest('.template-card');
-  if (tpl) {
-    openModal(tpl.querySelector('.template-name').textContent,
-      '<p>' + tpl.querySelector('.template-desc').textContent + '</p><button class="modal-btn" onclick="showToast(\'Demo download started\')">⬇ Download Template</button>');
+  if (tpl && !e.target.closest('.dl-btn')) {
+    const name = tpl.querySelector('.template-name').textContent;
+    openModal(name,
+      '<p style="margin-bottom:12px">' + tpl.querySelector('.template-desc').textContent + '</p>' +
+      '<div style="background:var(--gray-50);border-radius:8px;padding:12px;font-size:12px;color:var(--gray-600);margin-bottom:12px">📄 Format siap pakai · Sesuai regulasi Kemenag · Dapat diedit</div>' +
+      '<button class="modal-btn" onclick="setScore(2);showToast(\'⬇ Download dimulai\');addActivity(\'⬇\',\'' + name.replace(/'/g,'') + ' — didownload (+2 skor)\');document.getElementById(\'modalOverlay\').classList.remove(\'open\')">⬇ Download Template</button>');
+    addActivity('📁', name + ' — template dibuka');
     return;
   }
 
+  // ── Vendor card → bumps related pillar ────────────────
   const vendor = e.target.closest('.vendor-card');
   if (vendor) {
-    openModal(vendor.querySelector('.vendor-name').textContent,
-      '<p>' + vendor.querySelector('.vendor-cat').textContent + '</p><p style="margin-top:8px">' + vendor.querySelector('.vendor-rating').textContent + '</p>');
+    const name = vendor.querySelector('.vendor-name').textContent;
+    const cat = vendor.querySelector('.vendor-cat').textContent;
+    const rating = vendor.querySelector('.vendor-rating').textContent;
+    const logoEmoji = vendor.querySelector('.vendor-logo')?.textContent?.trim();
+    const pIdx = vendorPillarMap[logoEmoji];
+    let pillarNote = '';
+    if (pIdx) {
+      const pd = pillarData[pIdx];
+      pd.pct = Math.min(pd.pct + 1, 100);
+      const fill = document.querySelector('#page-blueprint .pillar-card.p' + pIdx + ' .progress-fill');
+      if (fill) setBar(fill, pd.pct);
+      const pctLabel = document.querySelector('#page-blueprint .pillar-card.p' + pIdx + ' span[style*="font-weight:600"]');
+      if (pctLabel) pctLabel.textContent = pd.pct + '%';
+      pillarNote = '<div style="margin:10px 0;padding:8px 12px;background:var(--green-light);color:var(--green);border-radius:8px;font-size:12px;font-weight:600">✓ Blueprint ' + pd.name + ' diperbarui +1%</div>';
+      addActivity('📊', pd.name + ' blueprint +1% karena vendor ' + name);
+    } else {
+      addActivity('🏢', name + ' — vendor dilihat');
+    }
+    openModal(name,
+      `<p style="color:var(--gray-400);font-size:12px;margin-bottom:8px">${cat}</p>
+      <div style="display:flex;align-items:center;gap:6px;margin-bottom:10px;font-size:14px;font-weight:600;color:var(--amber)">${rating}</div>
+      ${pillarNote}
+      <div style="background:var(--green-light);color:var(--green);font-size:12px;font-weight:600;padding:4px 10px;border-radius:6px;display:inline-block;margin-bottom:12px">✓ Terverifikasi HUDITA</div>
+      <p style="font-size:13px;color:var(--gray-600)">Vendor ini telah diverifikasi tim HUDITA untuk kualitas layanan, kehalalan, dan keandalan operasional.</p>
+      <button class="modal-btn" onclick="showToast('📞 Kontak vendor dikirim');document.getElementById('modalOverlay').classList.remove('open')">📞 Hubungi Vendor</button>`);
+    return;
+  }
+
+  // ── Consultation booking → +10 score milestone ────────
+  if (e.target.closest('.book-btn')) {
+    const name = e.target.closest('.consult-card')?.querySelector('.expert-name')?.textContent || 'Konsultan';
+    setScore(10, 'Konsultasi dijadwalkan! +10 Readiness Score');
+    addActivity('🎓', name + ' — konsultasi di-booking (+10 skor)');
+    showToast('📅 Booking berhasil!');
+    document.getElementById('modalOverlay')?.classList.remove('open');
+    return;
+  }
+
+  // ── Pillar card → highlight + activity ────────────────
+  const pillarCard = e.target.closest('.pillar-card');
+  if (pillarCard) {
+    const n = [...document.querySelectorAll('.pillar-card')].indexOf(pillarCard) + 1;
+    if (n && pillarData[n]) {
+      const p = pillarData[n];
+      showPillarDetail(n);
+      highlightPillarScore(n);
+      showToast('📋 ' + p.name + ' — ' + p.tasks);
+      addActivity('📋', p.name + ' — pilar dibuka dari Blueprint');
+    }
     return;
   }
 
   const consult = e.target.closest('.consult-card');
   if (consult) {
     openModal(consult.querySelector('.expert-name').textContent,
-      '<p>' + consult.querySelector('.expert-title').textContent + '</p><button class="modal-btn" onclick="showToast(\'Booking request sent\')">📅 Book Consultation</button>');
+      '<p>' + consult.querySelector('.expert-title').textContent + '</p><button class="modal-btn book-btn">📅 Booking Konsultasi</button>');
     return;
   }
 
@@ -1777,10 +2045,271 @@ document.addEventListener('click', function(e) {
   }
 
   if (e.target.closest('#userAvatarBtn')) {
-    openModal('Account Summary', '<p>MAFIRA Demo Agency</p><p style="margin-top:4px">Owner · Starter Plan</p><p style="margin-top:8px">Travel Readiness Score: 762/1000</p>');
+    openModal('Account Summary', '<p>MAFIRA Demo Agency</p><p style="margin-top:4px">Owner · Starter Plan</p><p style="margin-top:8px">Travel Readiness Score: ' + currentScore + '/1000</p>');
     return;
   }
 });
+
+// ═══════════════════════════════════════════════════
+// ACHIEVEMENT & PROGRESSION SYSTEM — HUDITA Phase 4
+// ═══════════════════════════════════════════════════
+const ACH = {
+  task:     { id:'task',     icon:'✅', name:'First Task Completed',    xp:10,  done:false },
+  template: { id:'template', icon:'📄', name:'First Template Download',  xp:5,   done:false },
+  vendor:   { id:'vendor',   icon:'🏢', name:'First Vendor Viewed',      xp:3,   done:false },
+  consult:  { id:'consult',  icon:'🎓', name:'First Consultation Booked',xp:20,  done:false },
+  score800: { id:'score800', icon:'🌟', name:'Readiness Score 800+',     xp:15,  done:false },
+  pillars:  { id:'pillars',  icon:'🗺️', name:'All 6 Pillars Opened',     xp:30,  done:false },
+};
+const LEVELS = [
+  { level:1, min:0,   max:49,  label:'Murid' },
+  { level:2, min:50,  max:119, label:'Praktisi' },
+  { level:3, min:120, max:249, label:'Ahli' },
+  { level:4, min:250, max:Infinity, label:'Master' },
+];
+let xp = 0;
+let pillarsOpened = new Set();
+
+function getLevelInfo(x) {
+  for (let i = LEVELS.length - 1; i >= 0; i--) if (x >= LEVELS[i].min) return LEVELS[i];
+  return LEVELS[0];
+}
+function getNextLevel(x) {
+  const cur = getLevelInfo(x);
+  return LEVELS.find(l => l.level === cur.level + 1) || null;
+}
+
+function addXP(amount) {
+  const prevLv = getLevelInfo(xp).level;
+  xp += amount;
+  const cur = getLevelInfo(xp);
+  const next = getNextLevel(xp);
+  // Update XP card
+  const lvEl = document.getElementById('xpLevelLabel');
+  const totEl = document.getElementById('xpTotal');
+  const nxtEl = document.getElementById('xpNextLabel');
+  const barEl = document.getElementById('xpBar');
+  if (lvEl) lvEl.textContent = 'Lv ' + cur.level + ' · ' + cur.label;
+  if (totEl) totEl.textContent = xp + ' XP';
+  if (nxtEl) nxtEl.textContent = next ? (next.min - xp) + ' XP ke Level ' + next.level : 'Level Maksimum 🏆';
+  if (barEl) {
+    const pct = next ? Math.min(100, ((xp - cur.min) / (next.min - cur.min)) * 100) : 100;
+    barEl.style.width = pct + '%';
+  }
+  // Level-up toast
+  if (cur.level > prevLv) showAchToast('⬆️', 'Level Up! Sekarang Level ' + cur.level + ' — ' + cur.label);
+}
+
+function unlock(key) {
+  const a = ACH[key];
+  if (!a || a.done) return;
+  a.done = true;
+  addXP(a.xp);
+  showAchToast('🏆', a.name);
+  renderAchCard();
+  addMilestone(a.icon, '🏆 ' + a.name, 'Achievement unlocked · baru saja');
+}
+
+function showAchToast(icon, text) {
+  const t = document.getElementById('toast');
+  t.innerHTML = '<span style="font-size:16px">' + icon + '</span><div><div style="font-size:10px;opacity:.7;letter-spacing:1px;text-transform:uppercase">Achievement Unlocked</div><div style="font-weight:600">' + text + '</div></div>';
+  t.style.display = 'flex';
+  t.style.gap = '10px';
+  t.style.alignItems = 'center';
+  t.classList.add('show');
+  clearTimeout(window._achTimer);
+  window._achTimer = setTimeout(() => { t.classList.remove('show'); t.style.display = ''; t.style.gap = ''; t.style.alignItems = ''; }, 3000);
+}
+
+function renderAchCard() {
+  const list = document.getElementById('achList');
+  const countEl = document.getElementById('achCount');
+  if (!list || !countEl) return;
+  const done = Object.values(ACH).filter(a => a.done);
+  countEl.textContent = done.length;
+  list.innerHTML = Object.values(ACH).map(a =>
+    '<div style="display:flex;align-items:center;gap:7px;font-size:12px;' + (a.done ? 'color:var(--gray-800)' : 'color:var(--gray-400)') + '">' +
+    '<span style="font-size:14px;' + (a.done ? '' : 'filter:grayscale(1);opacity:.4') + '">' + a.icon + '</span>' +
+    '<span' + (a.done ? ' style="font-weight:600"' : '') + '>' + a.name + '</span>' +
+    (a.done ? '<span style="margin-left:auto;font-size:10px;background:var(--gold-pale);color:var(--amber);padding:1px 6px;border-radius:8px;font-weight:700">+' + a.xp + ' XP</span>' : '') +
+    '</div>'
+  ).join('');
+}
+
+function addMilestone(icon, title, desc) {
+  const grid = document.getElementById('milestoneGrid');
+  if (!grid) return;
+  const card = document.createElement('div');
+  card.className = 'milestone-card';
+  card.style.animation = 'pulse .4s ease';
+  card.innerHTML = '<div class="milestone-icon">' + icon + '</div><div><div class="milestone-title">' + title + '</div><div class="milestone-desc">' + desc + '</div></div>';
+  grid.insertBefore(card, grid.firstChild);
+}
+
+// ── Hook into existing interactions ──────────────────────
+
+// Task complete
+const _origTaskCheck = document.querySelectorAll('.task-check');
+_origTaskCheck.forEach(el => {
+  el.addEventListener('click', function() {
+    if (this.classList.contains('done')) { addXP(10); unlock('task'); }
+    // score 800 check
+    if (currentScore >= 800) unlock('score800');
+  });
+});
+
+// Wrap setScore to check score800
+const _origSetScore = setScore;
+window.setScore = function(delta, milestone) {
+  _origSetScore(delta, milestone);
+  if (currentScore >= 800) unlock('score800');
+};
+
+// Template download
+document.addEventListener('click', function(e) {
+  if (e.target.closest('.dl-btn')) { addXP(5); unlock('template'); }
+  if (e.target.closest('.vendor-card')) { addXP(3); unlock('vendor'); }
+  if (e.target.closest('.book-btn')) { addXP(20); unlock('consult'); }
+  if (e.target.closest('.pillar-card')) {
+    const idx = [...document.querySelectorAll('.pillar-card')].indexOf(e.target.closest('.pillar-card')) + 1;
+    if (idx >= 1) { pillarsOpened.add(idx); if (pillarsOpened.size >= 6) unlock('pillars'); }
+  }
+}, true); // capture phase so it fires before existing handlers suppress bubbling
+
+// Init render
+renderAchCard();
+addXP(0);
+
+// ═══════════════════════════════════════════════════
+// SMART READINESS ADVISOR — HUDITA Phase 5
+// ═══════════════════════════════════════════════════
+const ADVISOR_PILLARS = [
+  { key:'p1', name:'Legalitas',   pct:88, color:'#3B82F6' },
+  { key:'p2', name:'Tour Leader', pct:55, color:'#8B5CF6' },
+  { key:'p3', name:'Jamaah',      pct:72, color:'#10B981' },
+  { key:'p4', name:'Hotel',       pct:65, color:'#F59E0B' },
+  { key:'p5', name:'Tiket',       pct:48, color:'#EF4444' },
+  { key:'p6', name:'Sistem',      pct:40, color:'#C9A84C' },
+];
+
+// Activity counter drives confidence
+let advisorActivity = 0;
+
+function getWeakestPillar() {
+  return ADVISOR_PILLARS.reduce((a, b) => b.pct < a.pct ? b : a);
+}
+
+function getConfidence(activity) {
+  if (activity >= 5) return { label:'High Confidence',  cls:'conf-high',   level:'high'   };
+  if (activity >= 2) return { label:'Medium Confidence',cls:'conf-medium',  level:'medium' };
+  return               { label:'Low Confidence',   cls:'conf-low',    level:'low'    };
+}
+
+function generateAdvisor(score, xpVal, completedTasks, openedPillars) {
+  // ── Priority & Recommendation ──────────────────────────
+  let priority, priorityCls, prioritySub, rec, action, actionLabel;
+
+  if (score < 500) {
+    priority    = 'Foundation';
+    priorityCls = 'adv-priority-foundation';
+    prioritySub = 'Bangun fondasi operasional yang kuat sebelum berkembang.';
+    rec         = 'Selesaikan tugas inti operasional: legalitas, TL, dan manajemen jamaah.';
+    action      = () => { navigate('blueprint', document.querySelector('[onclick*=blueprint]')); };
+    actionLabel = '→ Buka Blueprint';
+  } else if (score <= 800) {
+    priority    = 'Growth';
+    priorityCls = 'adv-priority-growth';
+    prioritySub = 'Tingkatkan kualitas layanan dan jangkauan vendor Anda.';
+    rec         = 'Perkuat vendor akomodasi dan tiket. Rekrut TL tambahan untuk kapasitas lebih besar.';
+    action      = () => { navigate('vendor', document.querySelector('[onclick*=vendor]')); };
+    actionLabel = '→ Vendor Directory';
+  } else {
+    priority    = 'Expansion';
+    priorityCls = 'adv-priority-expansion';
+    prioritySub = 'Fokus pada kemitraan strategis dan skala bisnis.';
+    rec         = 'Skor Anda sudah baik. Ekspansi ke kota baru, tambah kapasitas, dan bangun brand awareness.';
+    action      = () => { navigate('consultation', document.querySelector('[onclick*=consultation]')); };
+    actionLabel = '→ Konsultasi Pakar';
+  }
+
+  // ── Weakest pillar analysis ───────────────────────────
+  // Sync pct from live pillarData if available
+  if (typeof pillarData !== 'undefined') {
+    [1,2,3,4,5,6].forEach(n => {
+      if (pillarData[n]) ADVISOR_PILLARS[n-1].pct = pillarData[n].pct;
+    });
+  }
+  const weakest = getWeakestPillar();
+  const sorted  = [...ADVISOR_PILLARS].sort((a,b) => a.pct - b.pct);
+
+  // ── Confidence ────────────────────────────────────────
+  const conf = getConfidence(advisorActivity);
+
+  // ── Render ────────────────────────────────────────────
+  const el = id => document.getElementById(id);
+
+  // Priority
+  const pEl = el('advPriority');
+  if (pEl) { pEl.textContent = priority; pEl.className = 'adv-block-value ' + priorityCls; }
+  const psEl = el('advPrioritySub');
+  if (psEl) psEl.textContent = prioritySub;
+
+  // Recommendation
+  const rEl = el('advRec');
+  if (rEl) rEl.textContent = rec;
+  const abEl = el('advActionBtn');
+  if (abEl) { abEl.textContent = actionLabel; abEl.onclick = action; }
+
+  // Weakest pillar label
+  const wlEl = el('advWeakLabel');
+  if (wlEl) wlEl.textContent = 'Pilar terlemah: ' + weakest.name + ' (' + weakest.pct + '%)';
+
+  // Pillar mini-bars (bottom 4 by pct)
+  const barsEl = el('advPillarBars');
+  if (barsEl) {
+    barsEl.innerHTML = sorted.slice(0, 4).map(p =>
+      '<div class="adv-pillar-row">' +
+        '<div class="adv-pillar-name">' + p.name + '</div>' +
+        '<div class="adv-pillar-bar"><div class="adv-pillar-fill" style="width:' + p.pct + '%;background:' + p.color + '"></div></div>' +
+        '<div class="adv-pillar-pct">' + p.pct + '%</div>' +
+      '</div>'
+    ).join('');
+  }
+
+  // Confidence badge
+  const cdEl = el('advConfDot');
+  const clEl = el('advConfLabel');
+  if (cdEl) cdEl.className = 'conf-dot ' + conf.cls;
+  if (clEl) clEl.textContent = conf.label;
+
+  return { priority, rec, action, weakest: weakest.name, confidence: conf.level };
+}
+
+function refreshAdvisor() {
+  const completedTasks = document.querySelectorAll('.task-check.done').length;
+  generateAdvisor(currentScore, xp, completedTasks, pillarsOpened.size);
+}
+
+// ── Hook advisor into every trigger event ────────────────
+const _p5OrigSetScore = window.setScore;
+window.setScore = function(delta, milestone) {
+  _p5OrigSetScore(delta, milestone);
+  advisorActivity++;
+  refreshAdvisor();
+};
+
+document.addEventListener('click', function(e) {
+  let touched = false;
+  if (e.target.closest('.task-check'))  { touched = true; }
+  if (e.target.closest('.dl-btn'))      { touched = true; }
+  if (e.target.closest('.vendor-card')) { touched = true; }
+  if (e.target.closest('.book-btn'))    { touched = true; }
+  if (e.target.closest('.pillar-card')) { touched = true; }
+  if (touched) { advisorActivity++; setTimeout(refreshAdvisor, 150); }
+}, true);
+
+// Initial render
+refreshAdvisor();
 </script>
 </body>
 </html>
