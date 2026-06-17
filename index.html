@@ -6,6 +6,7 @@
 <title>HUDITA by MAFIRA</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
 :root {
   --navy: #0D1B3E;
@@ -561,6 +562,247 @@ body { font-family: 'Inter', sans-serif; background: var(--gray-50); color: var(
 @media (max-width: 480px) {
   .grid-4 { grid-template-columns: 1fr; }
 }
+/* ═══════════════════════════════════════════════════
+   EXECUTIVE READINESS REPORT — HUDITA Phase 7
+   ═══════════════════════════════════════════════════ */
+#reportModalOverlay {
+  position:fixed;inset:0;background:rgba(13,27,62,0.72);z-index:3000;
+  display:flex;align-items:center;justify-content:center;padding:16px;
+  opacity:0;pointer-events:none;transition:opacity 0.25s;
+}
+#reportModalOverlay.open { opacity:1;pointer-events:all; }
+#reportModal {
+  background:var(--white);border-radius:var(--radius-lg);width:100%;max-width:680px;
+  max-height:90vh;display:flex;flex-direction:column;box-shadow:var(--shadow-lg);
+  transform:translateY(12px);transition:transform 0.25s;overflow:hidden;
+}
+#reportModalOverlay.open #reportModal { transform:translateY(0); }
+.rpt-header {
+  background:linear-gradient(135deg,var(--navy) 0%,var(--navy-light) 100%);
+  padding:20px 24px;display:flex;align-items:flex-start;justify-content:space-between;flex-shrink:0;
+}
+.rpt-header-left { display:flex;align-items:center;gap:12px; }
+.rpt-header-icon {
+  width:44px;height:44px;border-radius:10px;
+  background:linear-gradient(135deg,var(--gold),var(--gold-light));
+  display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;
+}
+.rpt-header-title { font-family:'Playfair Display',serif;font-size:17px;font-weight:700;color:var(--white);line-height:1.2; }
+.rpt-header-sub { font-size:10px;color:rgba(201,168,76,0.8);letter-spacing:2px;text-transform:uppercase;margin-top:2px; }
+.rpt-close {
+  width:32px;height:32px;border-radius:8px;border:none;cursor:pointer;
+  background:rgba(255,255,255,0.1);color:rgba(255,255,255,0.7);font-size:18px;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .15s;
+}
+.rpt-close:hover { background:rgba(255,255,255,0.2);color:var(--white); }
+.rpt-body { overflow-y:auto;padding:20px 24px;flex:1; }
+.rpt-section { margin-bottom:20px; }
+.rpt-section:last-child { margin-bottom:0; }
+.rpt-section-label {
+  display:flex;align-items:center;gap:8px;font-size:11px;font-weight:700;
+  letter-spacing:1.5px;text-transform:uppercase;color:var(--gold);margin-bottom:10px;
+}
+.rpt-section-label::after { content:'';flex:1;height:1px;background:var(--gray-100); }
+.rpt-summary-box {
+  background:linear-gradient(135deg,var(--navy) 0%,var(--navy-light) 100%);
+  border-radius:12px;padding:16px 20px;color:var(--white);font-size:14px;line-height:1.65;
+}
+.rpt-score-row { display:flex;gap:12px;margin-bottom:14px; }
+.rpt-score-pill {
+  flex:1;background:rgba(255,255,255,0.1);border-radius:10px;padding:10px 14px;
+  display:flex;flex-direction:column;align-items:center;gap:2px;
+}
+.rpt-score-pill .val { font-size:20px;font-weight:700;color:var(--gold); }
+.rpt-score-pill .lbl { font-size:10px;color:rgba(255,255,255,0.55);text-align:center;letter-spacing:.5px; }
+.rpt-pillar-row {
+  display:flex;align-items:center;gap:10px;padding:8px 0;
+  border-bottom:1px solid var(--gray-100);font-size:13px;
+}
+.rpt-pillar-row:last-child { border-bottom:none; }
+.rpt-pillar-rank {
+  width:22px;height:22px;border-radius:6px;font-size:11px;font-weight:700;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.rpt-pillar-rank.gold { background:linear-gradient(135deg,var(--gold),var(--gold-light));color:var(--navy); }
+.rpt-pillar-rank.silver { background:var(--gray-100);color:var(--gray-600); }
+.rpt-pillar-rank.bronze { background:#FEF3C7;color:#92400E; }
+.rpt-pillar-rank.weak { background:var(--red-light);color:var(--red); }
+.rpt-pillar-name { flex:1;font-weight:600;color:var(--gray-800); }
+.rpt-pillar-bar-wrap { flex:2;height:6px;background:var(--gray-100);border-radius:4px;overflow:hidden; }
+.rpt-pillar-bar-fill { height:100%;border-radius:4px;transition:width .6s .2s; }
+.rpt-pillar-pct { font-size:12px;font-weight:700;min-width:36px;text-align:right; }
+.rpt-action-item {
+  display:flex;align-items:flex-start;gap:10px;padding:10px 12px;
+  background:var(--gray-50);border-radius:10px;margin-bottom:8px;border-left:3px solid var(--gold);
+}
+.rpt-action-item:last-child { margin-bottom:0; }
+.rpt-action-icon { font-size:18px;flex-shrink:0;margin-top:1px; }
+.rpt-action-text { font-size:13px;color:var(--gray-700);line-height:1.5; }
+.rpt-action-text strong { color:var(--gray-800); }
+.rpt-projection-box {
+  background:var(--gold-pale);border-radius:12px;padding:14px 16px;
+  display:flex;align-items:center;gap:14px;
+}
+.rpt-proj-icon { font-size:28px;flex-shrink:0; }
+.rpt-proj-text { font-size:13px;color:var(--gray-800);line-height:1.55; }
+.rpt-proj-text strong { color:var(--navy); }
+.rpt-footer {
+  border-top:1px solid var(--gray-100);padding:14px 24px;
+  display:flex;gap:10px;align-items:center;justify-content:flex-end;flex-shrink:0;
+  background:var(--white);
+}
+.rpt-btn {
+  display:flex;align-items:center;gap:7px;padding:9px 16px;border-radius:8px;
+  font-size:13px;font-weight:600;cursor:pointer;border:none;transition:all .2s;
+}
+.rpt-btn-outline {
+  background:transparent;border:1px solid var(--gray-200);color:var(--gray-600);
+}
+.rpt-btn-outline:hover { border-color:var(--gold);color:var(--gold);background:var(--gold-pale); }
+.rpt-btn-primary {
+  background:linear-gradient(135deg,var(--navy),var(--navy-light));color:var(--white);
+}
+.rpt-btn-primary:hover { opacity:.9;transform:translateY(-1px); }
+.rpt-btn-pdf {
+  border-color: var(--gold) !important;
+  color: var(--gold) !important;
+}
+.rpt-btn-pdf:hover {
+  background: var(--gold) !important;
+  color: var(--navy) !important;
+  border-color: var(--gold) !important;
+}
+/* Mobile: stack footer buttons */
+@media (max-width: 480px) {
+  .rpt-footer { flex-wrap: wrap; gap: 8px; }
+  .rpt-footer .rpt-btn { flex: 1 1 40%; justify-content: center; }
+}
+.gen-report-btn {
+  display:inline-flex;align-items:center;gap:7px;padding:9px 18px;
+  background:linear-gradient(135deg,var(--navy) 0%,var(--navy-light) 100%);
+  color:var(--white);border:none;border-radius:10px;font-size:13px;font-weight:600;
+  cursor:pointer;transition:all .2s;box-shadow:var(--shadow-sm);
+}
+.gen-report-btn:hover { opacity:.9;transform:translateY(-1px);box-shadow:var(--shadow-md); }
+.gen-report-btn svg { flex-shrink:0; }
+
+/* ===== PHASE 9 START ===== */
+.p9-page-header { display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:24px; gap:12px; flex-wrap:wrap; }
+.p9-page-title { font-size:22px; font-weight:700; color:var(--navy); font-family:'Playfair Display',serif; }
+.dark .p9-page-title { color:var(--gold-light); }
+.p9-page-sub { font-size:13px; color:var(--gray-400); margin-top:4px; }
+.p9-add-btn {
+  display:inline-flex; align-items:center; gap:8px; padding:10px 20px;
+  background:linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%);
+  color:#fff; border:none; border-radius:var(--radius-sm); font-size:13px; font-weight:600;
+  cursor:pointer; transition:all .2s; box-shadow:var(--shadow-sm); white-space:nowrap;
+}
+.p9-add-btn:hover { opacity:.88; transform:translateY(-1px); box-shadow:var(--shadow-md); }
+.p9-stats-row { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:24px; }
+@media(max-width:900px){ .p9-stats-row { grid-template-columns:repeat(2,1fr); } }
+@media(max-width:480px){ .p9-stats-row { grid-template-columns:1fr 1fr; } }
+.p9-stat-card { background:var(--white); border-radius:var(--radius); padding:16px 18px; box-shadow:var(--shadow-sm); border:1px solid var(--gray-100); }
+.p9-stat-label { font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:.5px; color:var(--gray-400); margin-bottom:6px; }
+.p9-stat-value { font-size:28px; font-weight:700; color:var(--navy); line-height:1; }
+.dark .p9-stat-value { color:var(--gold-light); }
+.p9-stat-sub { font-size:11px; color:var(--gray-400); margin-top:4px; }
+.p9-active-banner {
+  background:linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%);
+  border-radius:var(--radius-lg); padding:18px 22px; margin-bottom:20px;
+  display:flex; align-items:center; gap:14px; position:relative; overflow:hidden;
+}
+.p9-active-banner::after {
+  content:''; position:absolute; right:-20px; top:-20px;
+  width:110px; height:110px; border-radius:50%; background:rgba(201,168,76,.08); pointer-events:none;
+}
+.p9-active-icon { font-size:28px; flex-shrink:0; }
+.p9-active-info { flex:1; min-width:0; }
+.p9-active-chip { font-size:9px; letter-spacing:2px; color:rgba(201,168,76,.7); text-transform:uppercase; margin-bottom:3px; }
+.p9-active-name { font-size:16px; font-weight:700; color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.p9-active-meta { font-size:11px; color:rgba(255,255,255,.55); margin-top:2px; }
+.p9-active-score { font-size:30px; font-weight:700; color:var(--gold); flex-shrink:0; text-align:right; }
+.p9-active-score span { display:block; font-size:10px; font-weight:400; color:rgba(255,255,255,.4); }
+.p9-list-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; }
+.p9-list-title { font-size:14px; font-weight:700; color:var(--gray-800); }
+.dark .p9-list-title { color:var(--gray-600); }
+.p9-list-count { font-size:12px; color:var(--gray-400); }
+.p9-biz-list { display:flex; flex-direction:column; gap:10px; }
+.p9-biz-card {
+  background:var(--white); border-radius:var(--radius); padding:16px 18px;
+  box-shadow:var(--shadow-sm); border:1.5px solid var(--gray-100);
+  display:flex; align-items:center; gap:14px; transition:all .2s;
+}
+.p9-biz-card:hover { box-shadow:var(--shadow-md); border-color:var(--gray-200); }
+.p9-biz-card.p9-active { border-color:var(--gold); background:var(--gold-pale); }
+.dark .p9-biz-card.p9-active { background:rgba(201,168,76,.06); }
+.p9-biz-icon { width:44px; height:44px; border-radius:10px; background:rgba(13,27,62,.07); display:flex; align-items:center; justify-content:center; font-size:22px; flex-shrink:0; }
+.dark .p9-biz-icon { background:rgba(255,255,255,.07); }
+.p9-biz-info { flex:1; min-width:0; }
+.p9-biz-name { font-size:14px; font-weight:700; color:var(--navy); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.dark .p9-biz-name { color:var(--gold-light); }
+.p9-biz-sub { font-size:11px; color:var(--gray-400); margin-top:2px; }
+.p9-biz-score { text-align:right; flex-shrink:0; margin-right:10px; }
+.p9-biz-score-val { font-size:18px; font-weight:700; color:var(--gold); }
+.p9-biz-badge {
+  display:inline-block; font-size:10px; font-weight:700; padding:2px 8px;
+  border-radius:20px; margin-top:3px; white-space:nowrap;
+}
+.p9-biz-actions { display:flex; gap:6px; flex-shrink:0; align-items:center; flex-wrap:wrap; justify-content:flex-end; }
+.p9-btn-select {
+  padding:5px 13px; border-radius:7px; font-size:11px; font-weight:700; cursor:pointer; transition:all .2s;
+  border:1.5px solid var(--navy); background:transparent; color:var(--navy); white-space:nowrap;
+}
+.p9-btn-select:hover { background:var(--navy); color:#fff; }
+.p9-active .p9-btn-select { background:var(--gold); border-color:var(--gold); color:var(--navy); cursor:default; }
+.p9-btn-icon {
+  width:30px; height:30px; border-radius:7px; border:1.5px solid var(--gray-200);
+  background:var(--white); cursor:pointer; display:flex; align-items:center; justify-content:center;
+  color:var(--gray-600); transition:all .2s; flex-shrink:0;
+}
+.dark .p9-btn-icon { background:var(--gray-100); }
+.p9-btn-icon:hover { border-color:var(--gold); color:var(--gold); }
+.p9-btn-icon.p9-del:hover { border-color:#991B1B; color:#991B1B; }
+.p9-empty { text-align:center; padding:56px 20px; }
+.p9-empty-icon { font-size:52px; margin-bottom:14px; }
+.p9-empty-title { font-size:18px; font-weight:700; color:var(--navy); margin-bottom:8px; font-family:'Playfair Display',serif; }
+.dark .p9-empty-title { color:var(--gold-light); }
+.p9-empty-desc { font-size:13px; color:var(--gray-400); line-height:1.6; margin-bottom:22px; }
+.p9-modal-overlay {
+  display:none; position:fixed; inset:0; background:rgba(13,27,62,.6);
+  backdrop-filter:blur(3px); z-index:1050; align-items:center; justify-content:center; padding:20px;
+}
+.p9-modal-overlay.p9-open { display:flex; }
+.p9-modal-box {
+  background:var(--white); border-radius:var(--radius-lg); padding:28px; width:420px;
+  max-width:96vw; box-shadow:var(--shadow-lg); max-height:92vh; overflow-y:auto;
+}
+.p9-modal-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:20px; }
+.p9-modal-title { font-size:16px; font-weight:700; color:var(--navy); font-family:'Playfair Display',serif; }
+.dark .p9-modal-title { color:var(--gold-light); }
+.p9-modal-close { cursor:pointer; color:var(--gray-400); font-size:18px; line-height:1; padding:4px; border:none; background:none; }
+.p9-modal-close:hover { color:var(--navy); }
+.p9-field { margin-bottom:16px; }
+.p9-field label { display:block; font-size:12px; font-weight:600; color:var(--gray-600); margin-bottom:6px; }
+.p9-field input, .p9-field select {
+  width:100%; padding:10px 13px; border:1.5px solid var(--gray-200); border-radius:var(--radius-sm);
+  font-size:13px; font-family:'Inter',sans-serif; background:var(--white); color:var(--gray-800);
+  outline:none; transition:border-color .2s;
+}
+.p9-field input:focus, .p9-field select:focus { border-color:var(--gold); }
+.dark .p9-field input, .dark .p9-field select { background:var(--gray-100); color:var(--gray-800); }
+.p9-modal-footer { display:flex; gap:10px; justify-content:flex-end; margin-top:24px; }
+.p9-btn-cancel {
+  padding:10px 20px; border:1.5px solid var(--gray-200); border-radius:var(--radius-sm);
+  background:transparent; color:var(--gray-600); font-size:13px; font-weight:600; cursor:pointer; transition:all .2s;
+}
+.p9-btn-cancel:hover { border-color:var(--gray-400); }
+.p9-btn-save {
+  padding:10px 24px; background:linear-gradient(135deg, var(--navy), var(--navy-light));
+  color:#fff; border:none; border-radius:var(--radius-sm); font-size:13px; font-weight:700;
+  cursor:pointer; transition:opacity .2s;
+}
+.p9-btn-save:hover { opacity:.88; }
+/* ===== PHASE 9 END ===== */
 </style>
 </head>
 <body>
@@ -623,6 +865,12 @@ body { font-family: 'Inter', sans-serif; background: var(--gray-50); color: var(
       <span class="nav-text" data-i18n="nav.blueprint">Blueprint</span>
       <span class="badge">6</span>
     </div>
+    <!-- ===== PHASE 9 START ===== -->
+    <div class="nav-item" onclick="navigate('portfolio',this)">
+      <svg class="nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>
+      <span class="nav-text">📁 Portfolio</span>
+    </div>
+    <!-- ===== PHASE 9 END ===== -->
   </div>
 
   <div class="nav-section">
@@ -705,6 +953,15 @@ body { font-family: 'Inter', sans-serif; background: var(--gray-50); color: var(
 
     <!-- DASHBOARD -->
     <div class="page active" id="page-dashboard">
+
+      <!-- Generate Report CTA -->
+      <div style="display:flex;justify-content:flex-end;margin-bottom:14px">
+        <button class="gen-report-btn" onclick="openExecutiveReport()">
+          <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="13" y2="17"/></svg>
+          Generate Report
+        </button>
+      </div>
+
       <!-- Journey Banner -->
       <div class="journey-card">
         <div class="journey-label" data-i18n="hero.label">Perjalanan Bisnis Anda</div>
@@ -1545,6 +1802,72 @@ body { font-family: 'Inter', sans-serif; background: var(--gray-50); color: var(
       </div>
     </div>
 
+    <!-- ===== PHASE 9 START ===== -->
+    <!-- PORTFOLIO PAGE -->
+    <div class="page" id="page-portfolio">
+
+      <!-- Page header -->
+      <div class="p9-page-header">
+        <div>
+          <div class="p9-page-title">Business Portfolio</div>
+          <div class="p9-page-sub">Kelola semua bisnis Anda dalam satu tempat</div>
+        </div>
+        <button class="p9-add-btn" onclick="p9OpenModal()">
+          <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Tambah Bisnis
+        </button>
+      </div>
+
+      <!-- Stats row -->
+      <div class="p9-stats-row" id="p9StatsRow">
+        <div class="p9-stat-card">
+          <div class="p9-stat-label">Total Bisnis</div>
+          <div class="p9-stat-value" id="p9StatTotal">0</div>
+          <div class="p9-stat-sub">dalam portfolio</div>
+        </div>
+        <div class="p9-stat-card">
+          <div class="p9-stat-label">Rata-rata Score</div>
+          <div class="p9-stat-value" id="p9StatAvg" style="color:var(--gold)">—</div>
+          <div class="p9-stat-sub">readiness score</div>
+        </div>
+        <div class="p9-stat-card">
+          <div class="p9-stat-label">Score Tertinggi</div>
+          <div class="p9-stat-value" id="p9StatHigh" style="color:var(--green)">—</div>
+          <div class="p9-stat-sub" id="p9StatHighName">—</div>
+        </div>
+        <div class="p9-stat-card">
+          <div class="p9-stat-label">Score Terendah</div>
+          <div class="p9-stat-value" id="p9StatLow" style="color:var(--red)">—</div>
+          <div class="p9-stat-sub" id="p9StatLowName">—</div>
+        </div>
+      </div>
+
+      <!-- Active business banner (hidden if no business) -->
+      <div class="p9-active-banner" id="p9ActiveBanner" style="display:none">
+        <div class="p9-active-icon" id="p9ActiveIcon">🕋</div>
+        <div class="p9-active-info">
+          <div class="p9-active-chip">Bisnis Aktif Saat Ini</div>
+          <div class="p9-active-name" id="p9ActiveName">—</div>
+          <div class="p9-active-meta" id="p9ActiveMeta">—</div>
+        </div>
+        <div class="p9-active-score">
+          <div id="p9ActiveScoreVal">—</div>
+          <span>/ 1000</span>
+        </div>
+      </div>
+
+      <!-- List header -->
+      <div class="p9-list-header">
+        <div class="p9-list-title">Semua Bisnis</div>
+        <div class="p9-list-count" id="p9ListCount">0 bisnis</div>
+      </div>
+
+      <!-- Business list / empty state -->
+      <div id="p9BizList" class="p9-biz-list"></div>
+
+    </div><!-- end portfolio page -->
+    <!-- ===== PHASE 9 END ===== -->
+
   </div><!-- end content -->
 </div><!-- end main -->
 
@@ -1588,6 +1911,50 @@ body { font-family: 'Inter', sans-serif; background: var(--gray-50); color: var(
 <!-- TOAST -->
 <div class="toast" id="toast"></div>
 
+<!-- ===== PHASE 9 START ===== -->
+<!-- PORTFOLIO MODAL -->
+<div class="p9-modal-overlay" id="p9ModalOverlay" onclick="if(event.target===this)p9CloseModal()">
+  <div class="p9-modal-box" onclick="event.stopPropagation()">
+    <div class="p9-modal-header">
+      <div class="p9-modal-title" id="p9ModalTitle">Tambah Bisnis Baru</div>
+      <button class="p9-modal-close" onclick="p9CloseModal()">✕</button>
+    </div>
+    <div class="p9-field">
+      <label>Nama Bisnis <span style="color:var(--red)">*</span></label>
+      <input type="text" id="p9InputName" placeholder="cth. Azzahra Travel Umrah" maxlength="80">
+    </div>
+    <div class="p9-field">
+      <label>Industri <span style="color:var(--red)">*</span></label>
+      <select id="p9InputIndustry">
+        <option value="">— Pilih Industri —</option>
+        <option value="Umrah &amp; Haji">Umrah &amp; Haji</option>
+        <option value="Wisata Halal">Wisata Halal</option>
+        <option value="Pendidikan Islam">Pendidikan Islam</option>
+        <option value="Kuliner Halal">Kuliner Halal</option>
+        <option value="Fashion Muslim">Fashion Muslim</option>
+        <option value="Keuangan Syariah">Keuangan Syariah</option>
+        <option value="Properti Syariah">Properti Syariah</option>
+        <option value="Kesehatan Islami">Kesehatan Islami</option>
+        <option value="Lainnya">Lainnya</option>
+      </select>
+    </div>
+    <div class="p9-field">
+      <label>Status</label>
+      <select id="p9InputStatus">
+        <option value="Aktif">Aktif</option>
+        <option value="Persiapan">Persiapan</option>
+        <option value="Ditangguhkan">Ditangguhkan</option>
+      </select>
+    </div>
+    <input type="hidden" id="p9EditId">
+    <div class="p9-modal-footer">
+      <button class="p9-btn-cancel" onclick="p9CloseModal()">Batal</button>
+      <button class="p9-btn-save" onclick="p9SaveBusiness()" id="p9BtnSave">Simpan</button>
+    </div>
+  </div>
+</div>
+<!-- ===== PHASE 9 END ===== -->
+
 </div><!-- end app -->
 
 <script>
@@ -1619,7 +1986,8 @@ const pageTitles = {
   vendor: 'Vendor Directory',
   community: 'Community',
   consultation: 'Consultation',
-  settings: 'Pengaturan'
+  settings: 'Pengaturan',
+  portfolio: 'Business Portfolio'
 };
 
 function navigate(page, el) {
@@ -2308,8 +2676,1394 @@ document.addEventListener('click', function(e) {
   if (touched) { advisorActivity++; setTimeout(refreshAdvisor, 150); }
 }, true);
 
-// Initial render
-refreshAdvisor();
+
+// ═══════════════════════════════════════════════════
+// EXECUTIVE READINESS REPORT — HUDITA Phase 7
+// ═══════════════════════════════════════════════════
+
+// Cached plain-text version for copy/download
+let _reportPlainText = '';
+
+function generateExecutiveReport() {
+  // ── 1. Gather live data ───────────────────────────────────
+  const score     = typeof currentScore !== 'undefined' ? currentScore : 762;
+  const xpVal     = typeof xp !== 'undefined' ? xp : 0;
+  const lvInfo    = typeof getLevelInfo === 'function' ? getLevelInfo(xpVal) : { level:1, label:'Murid' };
+  const achDone   = typeof ACH !== 'undefined'
+                    ? Object.values(ACH).filter(a => a.done) : [];
+  const achCount  = achDone.length;
+  const achTotal  = typeof ACH !== 'undefined' ? Object.values(ACH).length : 6;
+  const completedTasks = document.querySelectorAll('.task-check.done').length;
+  const totalTasks     = document.querySelectorAll('.task-check').length;
+
+  // Pillar data — sync from live pillarData or fallback
+  const PILLAR_META = [
+    { n:1, name:'Legalitas',        icon:'⚖️', color:'#3B82F6' },
+    { n:2, name:'Tour Leader',      icon:'🧭', color:'#8B5CF6' },
+    { n:3, name:'Jamaah Mgmt',      icon:'👥', color:'#10B981' },
+    { n:4, name:'Hotel & Catering', icon:'🏨', color:'#F59E0B' },
+    { n:5, name:'Tiket & Transport',icon:'✈️', color:'#EF4444' },
+    { n:6, name:'Sistem & Tech',    icon:'💻', color:'#C9A84C' },
+  ];
+
+  const pillars = PILLAR_META.map(m => {
+    let pct = 50;
+    if (typeof pillarData !== 'undefined' && pillarData[m.n]) {
+      pct = pillarData[m.n].pct;
+    } else if (typeof ADVISOR_PILLARS !== 'undefined') {
+      const ap = ADVISOR_PILLARS.find(p => p.key === 'p' + m.n);
+      if (ap) pct = ap.pct;
+    }
+    return { ...m, pct };
+  });
+
+  const sorted     = [...pillars].sort((a,b) => b.pct - a.pct);
+  const top3       = sorted.slice(0, 3);
+  const bottom3    = sorted.slice(-3).reverse();   // weakest first
+  const avgPillar  = Math.round(pillars.reduce((s,p) => s+p.pct, 0) / pillars.length);
+
+  // Advisor result
+  let advisorPriority = 'Growth', advisorRec = '', advisorAction = '';
+  const advPriorityEl = document.getElementById('advPriority');
+  const advRecEl      = document.getElementById('advRec');
+  if (advPriorityEl) advisorPriority = advPriorityEl.textContent.trim();
+  if (advRecEl)      advisorRec      = advRecEl.textContent.trim();
+
+  // ── 2. Score classification ───────────────────────────────
+  const scoreLabel = score >= 900 ? 'Sangat Baik (Excellent)'
+                   : score >= 750 ? 'Baik (Good)'
+                   : score >= 600 ? 'Cukup (Fair)'
+                   : score >= 400 ? 'Perlu Perhatian (Needs Attention)'
+                   : 'Kritis (Critical)';
+
+  // ── 3. Growth Projection ──────────────────────────────────
+  const weakestPillar  = bottom3[0];
+  const gainIfFocus    = Math.round((100 - weakestPillar.pct) * 0.4); // conservative 40% capture
+  const projectedScore = Math.min(1000, score + gainIfFocus + 10);    // +10 for advisor action
+  const projectedStage = projectedScore >= 850 ? 'Arafah — Tingkat Mahir'
+                       : projectedScore >= 700 ? 'Musdalifah — Fondasi Kuat'
+                       : projectedScore >= 550 ? 'Mina — Berkembang'
+                       : 'Makkah — Memulai';
+
+  const actionItems = [
+    {
+      icon:'🎯',
+      title: 'Perkuat ' + weakestPillar.name,
+      desc:  weakestPillar.name + ' saat ini di ' + weakestPillar.pct + '%. Selesaikan ' +
+             (weakestPillar.pct < 50 ? 'tugas inti' : 'tugas lanjutan') +
+             ' untuk mendorong skor keseluruhan.',
+    },
+    {
+      icon:'📋',
+      title: 'Advisor: ' + advisorPriority,
+      desc:  advisorRec || 'Ikuti rekomendasi Smart Advisor untuk mempercepat pertumbuhan bisnis.',
+    },
+    {
+      icon:'🎓',
+      title: 'Konsultasi Pakar',
+      desc:  'Booking sesi konsultasi (+10 Readiness Score) untuk mendapat arahan langsung dari praktisi berpengalaman.',
+    },
+  ];
+
+  // ── 4. Build plain-text version ──────────────────────────
+  const now = new Date().toLocaleDateString('id-ID', { day:'numeric', month:'long', year:'numeric' });
+  _reportPlainText = [
+    '============================================================',
+    '     EXECUTIVE READINESS REPORT — HUDITA by MAFIRA',
+    '     MAFIRA Demo Agency  |  ' + now,
+    '============================================================',
+    '',
+    '[ A ] EXECUTIVE SUMMARY',
+    '──────────────────────────────────────────────────────────',
+    'Travel Readiness Score : ' + score + ' / 1000  (' + scoreLabel + ')',
+    'XP Level               : Lv ' + lvInfo.level + ' — ' + lvInfo.label + '  (' + xpVal + ' XP)',
+    'Achievements           : ' + achCount + ' / ' + achTotal + ' unlocked',
+    'Completed Tasks        : ' + completedTasks + ' / ' + totalTasks,
+    'Avg Pillar Progress    : ' + avgPillar + '%',
+    'Advisor Priority       : ' + advisorPriority,
+    '',
+    'Bisnis Anda menunjukkan kesiapan operasional yang ' +
+      (score >= 700 ? 'baik' : 'perlu ditingkatkan') +
+      ' dengan Readiness Score ' + score + '/1000. ' +
+      'Tingkat XP saat ini ' + lvInfo.label + ' mencerminkan keterlibatan aktif dalam platform HUDITA.',
+    '',
+    '[ B ] STRENGTHS — TOP 3 PILAR',
+    '──────────────────────────────────────────────────────────',
+    ...top3.map((p,i) => (i+1) + '. ' + p.name + ' — ' + p.pct + '%'),
+    '',
+    '[ C ] AREAS FOR IMPROVEMENT',
+    '──────────────────────────────────────────────────────────',
+    ...bottom3.map((p,i) => (i+1) + '. ' + p.name + ' — ' + p.pct + '%  (perlu perhatian)'),
+    '',
+    '[ D ] RECOMMENDED ACTIONS',
+    '──────────────────────────────────────────────────────────',
+    ...actionItems.map((a,i) => (i+1) + '. ' + a.title + '\n   ' + a.desc),
+    '',
+    '[ E ] GROWTH PROJECTION',
+    '──────────────────────────────────────────────────────────',
+    'Jika Anda menyelesaikan rekomendasi di atas:',
+    '  Projected Score  : ~' + projectedScore + ' / 1000',
+    '  Next Stage       : ' + projectedStage,
+    '  Est. Score Gain  : +' + (projectedScore - score) + ' poin',
+    '',
+    '============================================================',
+    '  Dibuat otomatis oleh HUDITA · hudita.mafira.co',
+    '============================================================',
+  ].join('\n');
+
+  // ── 5. Build HTML for modal ───────────────────────────────
+  const rankClass = (i) => i === 0 ? 'gold' : i === 1 ? 'silver' : 'bronze';
+
+  const html = `
+    <!-- Score pills row -->
+    <div class="rpt-section">
+      <div class="rpt-section-label">A &nbsp; Executive Summary</div>
+      <div class="rpt-summary-box">
+        <div class="rpt-score-row">
+          <div class="rpt-score-pill">
+            <div class="val">${score}</div>
+            <div class="lbl">Readiness Score<br>/ 1000</div>
+          </div>
+          <div class="rpt-score-pill">
+            <div class="val">Lv ${lvInfo.level}</div>
+            <div class="lbl">${lvInfo.label}<br>${xpVal} XP</div>
+          </div>
+          <div class="rpt-score-pill">
+            <div class="val">${achCount}/${achTotal}</div>
+            <div class="lbl">Achievements<br>Unlocked</div>
+          </div>
+          <div class="rpt-score-pill">
+            <div class="val">${completedTasks}/${totalTasks}</div>
+            <div class="lbl">Tasks<br>Completed</div>
+          </div>
+        </div>
+        <p style="font-size:13px;line-height:1.65;color:rgba(255,255,255,0.82)">
+          Bisnis Anda menunjukkan kesiapan operasional yang
+          <strong style="color:var(--gold-light)">${score >= 700 ? 'baik' : score >= 500 ? 'berkembang' : 'perlu ditingkatkan'}</strong>
+          dengan Readiness Score <strong style="color:var(--gold-light)">${score}/1000 (${scoreLabel})</strong>.
+          Tingkat XP <strong style="color:var(--gold-light)">${lvInfo.label}</strong>
+          mencerminkan keterlibatan aktif dalam platform HUDITA.
+          Rata-rata kemajuan 6 pilar saat ini <strong style="color:var(--gold-light)">${avgPillar}%</strong>.
+        </p>
+      </div>
+    </div>
+
+    <!-- Strengths -->
+    <div class="rpt-section">
+      <div class="rpt-section-label">B &nbsp; Strengths — Top 3 Pilar</div>
+      ${top3.map((p,i) => `
+        <div class="rpt-pillar-row">
+          <div class="rpt-pillar-rank ${rankClass(i)}">${i+1}</div>
+          <span style="font-size:16px">${p.icon}</span>
+          <div class="rpt-pillar-name">${p.name}</div>
+          <div class="rpt-pillar-bar-wrap">
+            <div class="rpt-pillar-bar-fill" style="width:${p.pct}%;background:${p.color}"></div>
+          </div>
+          <div class="rpt-pillar-pct" style="color:${p.color}">${p.pct}%</div>
+        </div>`).join('')}
+    </div>
+
+    <!-- Areas for Improvement -->
+    <div class="rpt-section">
+      <div class="rpt-section-label">C &nbsp; Areas for Improvement</div>
+      ${bottom3.map((p,i) => `
+        <div class="rpt-pillar-row">
+          <div class="rpt-pillar-rank weak">${i+1}</div>
+          <span style="font-size:16px">${p.icon}</span>
+          <div class="rpt-pillar-name">${p.name}</div>
+          <div class="rpt-pillar-bar-wrap">
+            <div class="rpt-pillar-bar-fill" style="width:${p.pct}%;background:${p.color}"></div>
+          </div>
+          <div class="rpt-pillar-pct" style="color:${p.color}">${p.pct}%</div>
+        </div>`).join('')}
+    </div>
+
+    <!-- Recommended Actions -->
+    <div class="rpt-section">
+      <div class="rpt-section-label">D &nbsp; Recommended Actions</div>
+      ${actionItems.map(a => `
+        <div class="rpt-action-item">
+          <div class="rpt-action-icon">${a.icon}</div>
+          <div class="rpt-action-text"><strong>${a.title}</strong><br>${a.desc}</div>
+        </div>`).join('')}
+    </div>
+
+    <!-- Growth Projection -->
+    <div class="rpt-section">
+      <div class="rpt-section-label">E &nbsp; Growth Projection</div>
+      <div class="rpt-projection-box">
+        <div class="rpt-proj-icon">🚀</div>
+        <div class="rpt-proj-text">
+          Jika Anda menyelesaikan semua rekomendasi di atas, Readiness Score Anda diproyeksikan naik ke
+          <strong>~${projectedScore}/1000</strong> — memasuki tahap
+          <strong>${projectedStage}</strong>.
+          Estimasi kenaikan skor: <strong>+${projectedScore - score} poin</strong>.
+          Fokuskan energi pada <strong>${weakestPillar.name} (${weakestPillar.pct}%)</strong>
+          untuk dampak terbesar.
+        </div>
+      </div>
+    </div>
+
+    <div style="font-size:11px;color:var(--gray-400);text-align:center;padding-top:8px;border-top:1px solid var(--gray-100)">
+      Dibuat otomatis oleh HUDITA &nbsp;·&nbsp; ${now}
+    </div>
+  `;
+
+  return html;
+}
+
+function openExecutiveReport() {
+  const overlay = document.getElementById('reportModalOverlay');
+  const body    = document.getElementById('reportBody');
+  const dateSub = document.getElementById('rptDate');
+  const now = new Date().toLocaleDateString('id-ID', { day:'numeric', month:'long', year:'numeric' });
+  if (dateSub) dateSub.textContent = 'HUDITA  ·  MAFIRA Demo Agency  ·  ' + now;
+  if (body) body.innerHTML = '<div style="text-align:center;padding:28px 0;color:var(--gray-400)"><div style="font-size:28px;margin-bottom:6px">⏳</div><div style="font-size:13px">Generating report…</div></div>';
+  overlay.classList.add('open');
+  document.body.style.overflow = 'hidden';
+
+  // Short async delay for "generating" feel
+  setTimeout(() => {
+    if (body) body.innerHTML = generateExecutiveReport();
+    addActivity('📊', 'Executive Report digenerate');
+    if (typeof showToast === 'function') showToast('📊 Executive Readiness Report siap!');
+  }, 480);
+}
+
+function closeExecutiveReport() {
+  document.getElementById('reportModalOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function copyReport() {
+  if (!_reportPlainText) generateExecutiveReport();
+  navigator.clipboard.writeText(_reportPlainText).then(() => {
+    if (typeof showToast === 'function') showToast('✅ Report disalin ke clipboard!');
+  }).catch(() => {
+    // fallback
+    const ta = document.createElement('textarea');
+    ta.value = _reportPlainText;
+    ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    if (typeof showToast === 'function') showToast('✅ Report disalin!');
+  });
+}
+
+function downloadReport() {
+  if (!_reportPlainText) generateExecutiveReport();
+  const now   = new Date().toISOString().slice(0,10);
+  const fname = 'HUDITA_Executive_Report_' + now + '.txt';
+  const blob  = new Blob([_reportPlainText], { type:'text/plain;charset=utf-8' });
+  const url   = URL.createObjectURL(blob);
+  const a     = document.createElement('a');
+  a.href = url; a.download = fname;
+  document.body.appendChild(a); a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  if (typeof showToast === 'function') showToast('⬇ Report berhasil didownload!');
+}
+
+// Close modal on Escape key
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && document.getElementById('reportModalOverlay').classList.contains('open')) {
+    closeExecutiveReport();
+  }
+});
+
+// ═══════════════════════════════════════════════════
+// PROFESSIONAL PDF EXPORT — HUDITA Phase 8
+// ═══════════════════════════════════════════════════
+
+async function exportPDF() {
+  const btn = document.getElementById('exportPdfBtn');
+  if (btn) { btn.textContent = '⏳ Generating…'; btn.disabled = true; }
+
+  // Ensure report data is fresh
+  generateExecutiveReport();
+
+  // ── Gather data (mirrors generateExecutiveReport logic) ──
+  const score       = typeof currentScore !== 'undefined' ? currentScore : 762;
+  const xpVal       = typeof xp !== 'undefined' ? xp : 0;
+  const lvInfo      = typeof getLevelInfo === 'function' ? getLevelInfo(xpVal) : { level:1, label:'Murid' };
+  const achDone     = typeof ACH !== 'undefined' ? Object.values(ACH).filter(a => a.done) : [];
+  const achCount    = achDone.length;
+  const achTotal    = typeof ACH !== 'undefined' ? Object.values(ACH).length : 6;
+  const doneTasks   = document.querySelectorAll('.task-check.done').length;
+  const totalTasks  = document.querySelectorAll('.task-check').length;
+  const businessName = 'MAFIRA Demo Agency';
+  const now          = new Date().toLocaleDateString('id-ID', { day:'numeric', month:'long', year:'numeric' });
+
+  const PILLAR_META = [
+    { n:1, name:'Legalitas',         color:[59,130,246]  },
+    { n:2, name:'Tour Leader',       color:[139,92,246]  },
+    { n:3, name:'Jamaah Management', color:[16,185,129]  },
+    { n:4, name:'Hotel & Catering',  color:[245,158,11]  },
+    { n:5, name:'Tiket & Transport', color:[239,68,68]   },
+    { n:6, name:'Sistem & Tech',     color:[201,168,76]  },
+  ];
+
+  const pillars = PILLAR_META.map(m => {
+    let pct = 50;
+    if (typeof pillarData !== 'undefined' && pillarData[m.n]) pct = pillarData[m.n].pct;
+    else if (typeof ADVISOR_PILLARS !== 'undefined') {
+      const ap = ADVISOR_PILLARS.find(p => p.key === 'p' + m.n);
+      if (ap) pct = ap.pct;
+    }
+    return { ...m, pct };
+  });
+
+  const sorted   = [...pillars].sort((a, b) => b.pct - a.pct);
+  const top3     = sorted.slice(0, 3);
+  const bottom3  = sorted.slice(-3).reverse();
+  const avgPillar = Math.round(pillars.reduce((s, p) => s + p.pct, 0) / pillars.length);
+
+  const scoreLabel = score >= 900 ? 'Sangat Baik' : score >= 750 ? 'Baik' : score >= 600 ? 'Cukup' : score >= 400 ? 'Perlu Perhatian' : 'Kritis';
+
+  const advisorPriority = document.getElementById('advPriority')?.textContent?.trim() || 'Growth';
+  const advisorRec      = document.getElementById('advRec')?.textContent?.trim() || '';
+
+  const weakestPillar  = bottom3[0];
+  const gainIfFocus    = Math.round((100 - weakestPillar.pct) * 0.4);
+  const projectedScore = Math.min(1000, score + gainIfFocus + 10);
+  const growthPct      = Math.round(((projectedScore - score) / score) * 100);
+  const projectedStage = projectedScore >= 850 ? 'Arafah — Tingkat Mahir'
+                       : projectedScore >= 700 ? 'Musdalifah — Fondasi Kuat'
+                       : projectedScore >= 550 ? 'Mina — Berkembang' : 'Makkah — Memulai';
+
+  // ── PDF Setup ─────────────────────────────────────────────
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ orientation:'portrait', unit:'mm', format:'a4' });
+  const PW  = 210;   // page width mm
+  const PH  = 297;   // page height mm
+  const ML  = 18;    // margin left
+  const MR  = 18;    // margin right
+  const CW  = PW - ML - MR;  // content width
+  const FOOTER_H = 14;
+
+  // ── Colour palette ────────────────────────────────────────
+  const NAVY   = [13, 27, 62];
+  const NAVYM  = [22, 38, 80];
+  const GOLD   = [201, 168, 76];
+  const GOLDL  = [228, 200, 122];
+  const WHITE  = [255, 255, 255];
+  const GRAY1  = [238, 240, 246];
+  const GRAY4  = [144, 153, 180];
+  const GRAY6  = [90, 98, 128];
+  const GRAY8  = [45, 51, 82];
+  const GREEN  = [46, 125, 82];
+  const RED    = [153, 27, 27];
+
+  // ── Helpers ───────────────────────────────────────────────
+  function setFill(rgb)   { doc.setFillColor(...rgb); }
+  function setTxt(rgb)    { doc.setTextColor(...rgb); }
+  function setDraw(rgb)   { doc.setDrawColor(...rgb); }
+  function bold(size)     { doc.setFont('helvetica','bold'); doc.setFontSize(size); }
+  function normal(size)   { doc.setFont('helvetica','normal'); doc.setFontSize(size); }
+  function italic(size)   { doc.setFont('helvetica','italic'); doc.setFontSize(size); }
+
+  function footer(pageLabel) {
+    const y = PH - 9;
+    setFill(NAVY);
+    doc.rect(0, PH - FOOTER_H, PW, FOOTER_H, 'F');
+    setTxt(GOLDL);
+    normal(7.5);
+    doc.text('Generated by HUDITA  ·  hudita.mafira.co', ML, y);
+    doc.text(pageLabel, PW - MR, y, { align:'right' });
+    setTxt(GRAY4);
+    doc.text(now, PW / 2, y, { align:'center' });
+  }
+
+  function sectionHeader(label, y, accent = GOLD) {
+    setFill(accent);
+    doc.rect(ML, y, 3, 6, 'F');
+    bold(11);
+    setTxt(NAVY);
+    doc.text(label, ML + 6, y + 4.8);
+    setDraw(GRAY1);
+    doc.setLineWidth(0.3);
+    doc.line(ML, y + 8, ML + CW, y + 8);
+    return y + 13;
+  }
+
+  function pill(x, y, w, h, label, value, valuColor) {
+    setFill(GRAY1);
+    doc.roundedRect(x, y, w, h, 3, 3, 'F');
+    normal(7);
+    setTxt(GRAY4);
+    doc.text(label, x + w / 2, y + 5.5, { align:'center' });
+    bold(13);
+    setTxt(valuColor || NAVY);
+    doc.text(String(value), x + w / 2, y + 13, { align:'center' });
+  }
+
+  function progressBar(x, y, w, h, pct, fillRgb, bgRgb) {
+    setFill(bgRgb || GRAY1);
+    doc.roundedRect(x, y, w, h, h/2, h/2, 'F');
+    if (pct > 0) {
+      setFill(fillRgb || GOLD);
+      doc.roundedRect(x, y, Math.max(w * pct / 100, h), h, h/2, h/2, 'F');
+    }
+  }
+
+  function tableRow(cols, y, rowH, isHeader, stripe) {
+    // cols: [{text, x, w, align}]
+    if (isHeader) { setFill(NAVY); doc.rect(ML, y, CW, rowH, 'F'); }
+    else if (stripe) { setFill([248,249,252]); doc.rect(ML, y, CW, rowH, 'F'); }
+    cols.forEach(c => {
+      if (isHeader) { bold(8); setTxt(WHITE); }
+      else { normal(8); setTxt(GRAY8); }
+      doc.text(c.text, c.x + (c.align === 'right' ? c.w - 1 : c.align === 'center' ? c.w/2 : 2), y + rowH * 0.66, { align: c.align || 'left' });
+    });
+    setDraw(GRAY1); doc.setLineWidth(0.2);
+    doc.line(ML, y + rowH, ML + CW, y + rowH);
+    return y + rowH;
+  }
+
+  // ══════════════════════════════════════════════════════════
+  // PAGE 1 — COVER
+  // ══════════════════════════════════════════════════════════
+  // Full-bleed navy header
+  setFill(NAVY);
+  doc.rect(0, 0, PW, 90, 'F');
+
+  // Gold accent bar
+  setFill(GOLD);
+  doc.rect(0, 88, PW, 3, 'F');
+
+  // Logo mark (geometric square pattern)
+  const lx = ML, ly = 16;
+  setFill(GOLD);
+  doc.roundedRect(lx, ly, 12, 12, 2, 2, 'F');
+  setFill(NAVY);
+  doc.rect(lx + 2, ly + 2, 4, 4, 'F');
+  doc.rect(lx + 7, ly + 7, 4, 4, 'F');
+
+  // HUDITA wordmark
+  bold(22);
+  setTxt(WHITE);
+  doc.text('HUDITA', lx + 16, ly + 9);
+  normal(8);
+  setTxt(GOLD);
+  doc.text('by MAFIRA  ·  Business Readiness Platform', lx + 16, ly + 15);
+
+  // Horizontal rule
+  setFill(GOLDL);
+  doc.rect(ML, ly + 20, CW, 0.5, 'F');
+
+  // Main title block
+  bold(26);
+  setTxt(WHITE);
+  doc.text('Business Readiness', ML, 58);
+  bold(26);
+  setTxt(GOLD);
+  doc.text('Assessment Report', ML, 68);
+
+  normal(10);
+  setTxt([200,210,230]);
+  doc.text('Executive Edition  ·  HUDITA MVP Phase 8', ML, 78);
+
+  // Business info card
+  setFill(WHITE);
+  doc.roundedRect(ML, 100, CW, 52, 5, 5, 'F');
+  setDraw(GRAY1); doc.setLineWidth(0.4);
+  doc.roundedRect(ML, 100, CW, 52, 5, 5, 'S');
+
+  bold(9);
+  setTxt(GRAY4);
+  doc.text('PREPARED FOR', ML + 10, 112);
+  bold(16);
+  setTxt(NAVY);
+  doc.text(businessName, ML + 10, 122);
+  normal(9);
+  setTxt(GRAY6);
+  doc.text('Report Date: ' + now, ML + 10, 130);
+  doc.text('Platform: HUDITA  ·  Advisor Priority: ' + advisorPriority, ML + 10, 137);
+
+  // Divider
+  setDraw(GRAY1); doc.setLineWidth(0.3);
+  doc.line(ML + CW / 2, 104, ML + CW / 2, 148);
+
+  // Score block (right half)
+  const rx = ML + CW / 2 + 10;
+  bold(9);
+  setTxt(GRAY4);
+  doc.text('READINESS SCORE', rx, 112);
+  bold(36);
+  setTxt(NAVY);
+  doc.text(String(score), rx, 130);
+  normal(9);
+  setTxt(GRAY6);
+  doc.text('/ 1000  ·  ' + scoreLabel, rx, 137);
+
+  // Score progress bar
+  progressBar(rx, 141, 70, 4, score / 10, GOLD, GRAY1);
+
+  // Metrics row
+  const metrics = [
+    { label:'XP Level',       value:'Lv ' + lvInfo.level + ' ' + lvInfo.label },
+    { label:'Achievements',   value:achCount + '/' + achTotal + ' Unlocked' },
+    { label:'Tasks Done',     value:doneTasks + '/' + totalTasks },
+    { label:'Avg Pillar',     value:avgPillar + '%' },
+  ];
+  const mW = CW / 4;
+  metrics.forEach((m, i) => {
+    pill(ML + i * mW, 164, mW - 3, 20, m.label, m.value, NAVY);
+  });
+
+  // Pillar overview bar chart
+  let bx = ML, by = 200;
+  bold(9); setTxt(GRAY6);
+  doc.text('PILLAR OVERVIEW', bx, by - 2);
+  by += 2;
+  const bW = CW / pillars.length - 3;
+  pillars.forEach((p, i) => {
+    const bH = 28;
+    const fillH = Math.max(1, bH * p.pct / 100);
+    setFill(GRAY1);
+    doc.roundedRect(bx, by, bW, bH, 2, 2, 'F');
+    setFill(p.color);
+    doc.roundedRect(bx, by + bH - fillH, bW, fillH, 2, 2, 'F');
+    normal(6.5); setTxt(GRAY6);
+    const shortName = p.name.split(' ')[0];
+    doc.text(shortName, bx + bW / 2, by + bH + 5, { align:'center' });
+    bold(7); setTxt(NAVY);
+    doc.text(p.pct + '%', bx + bW / 2, by + bH + 10, { align:'center' });
+    bx += bW + 3;
+  });
+
+  footer('Page 1 of 7');
+
+  // ══════════════════════════════════════════════════════════
+  // PAGE 2 — EXECUTIVE SUMMARY
+  // ══════════════════════════════════════════════════════════
+  doc.addPage();
+  setFill(NAVY);
+  doc.rect(0, 0, PW, 18, 'F');
+  bold(11); setTxt(GOLD);
+  doc.text('HUDITA Business Readiness Assessment', ML, 11);
+  bold(9); setTxt([160,170,200]);
+  doc.text('Executive Summary', PW - MR, 11, { align:'right' });
+
+  let y = 30;
+  y = sectionHeader('EXECUTIVE SUMMARY', y);
+
+  // Summary narrative box
+  setFill([247,249,253]);
+  doc.roundedRect(ML, y, CW, 38, 4, 4, 'F');
+  setDraw(GOLD); doc.setLineWidth(0.6);
+  doc.line(ML, y, ML, y + 38);
+  normal(9.5); setTxt(GRAY8);
+  const summaryText = `Business readiness is progressing ${score >= 700 ? 'well' : 'steadily'} with a score of ${score}/1000 (${scoreLabel}). ` +
+    `The agency demonstrates ${score >= 750 ? 'strong' : 'developing'} operational foundations across 6 key pillars, ` +
+    `with an average pillar completion of ${avgPillar}%. ` +
+    `Current XP level is ${lvInfo.label} (${xpVal} XP) with ${achCount} of ${achTotal} achievements unlocked. ` +
+    `The Smart Advisor has classified the current business phase as "${advisorPriority}".`;
+
+  const summaryLines = doc.splitTextToSize(summaryText, CW - 10);
+  doc.text(summaryLines, ML + 6, y + 8);
+  y += 46;
+
+  // Advisor recommendation box
+  y = sectionHeader('ADVISOR ENGINE RESULT', y);
+  setFill([248,250,255]);
+  doc.roundedRect(ML, y, CW, 32, 4, 4, 'F');
+  setFill(GOLD);
+  doc.roundedRect(ML, y, CW, 8, 4, 4, 'F');
+  doc.rect(ML, y + 4, CW, 4, 'F');
+  bold(8.5); setTxt(NAVY);
+  doc.text('Priority Phase: ' + advisorPriority, ML + 6, y + 5.5);
+  normal(9); setTxt(GRAY8);
+  const recLines = doc.splitTextToSize(advisorRec || 'Complete core operational tasks across all 6 pillars to accelerate readiness score.', CW - 10);
+  doc.text(recLines, ML + 6, y + 16);
+  y += 40;
+
+  // Key metrics table
+  y = sectionHeader('KEY PERFORMANCE INDICATORS', y);
+  const kpiCols = [
+    { text:'Metric',          x:ML,      w:60 },
+    { text:'Current Value',   x:ML+60,   w:50 },
+    { text:'Status',          x:ML+110,  w:CW-110 },
+  ];
+  y = tableRow(kpiCols, y, 8, true, false);
+  const kpiData = [
+    ['Travel Readiness Score', score + ' / 1000',    scoreLabel],
+    ['XP Level',               'Lv ' + lvInfo.level + ' · ' + lvInfo.label, xpVal + ' XP accumulated'],
+    ['Achievement Progress',   achCount + ' / ' + achTotal + ' unlocked',  Math.round(achCount/achTotal*100) + '% complete'],
+    ['Task Completion',        doneTasks + ' / ' + totalTasks + ' tasks',   Math.round(doneTasks/totalTasks*100) + '% done'],
+    ['Avg Pillar Progress',    avgPillar + '%',                            score >= 700 ? 'On Track' : 'Needs Focus'],
+    ['Advisor Priority',       advisorPriority,                            'Active guidance available'],
+  ];
+  kpiData.forEach((row, i) => {
+    const rowCols = [
+      { text:row[0], x:ML,     w:60 },
+      { text:row[1], x:ML+60,  w:50 },
+      { text:row[2], x:ML+110, w:CW-110 },
+    ];
+    y = tableRow(rowCols, y, 8, false, i%2===0);
+  });
+
+  footer('Page 2 of 7');
+
+  // ══════════════════════════════════════════════════════════
+  // PAGE 3 — STRENGTH ANALYSIS
+  // ══════════════════════════════════════════════════════════
+  doc.addPage();
+  setFill(NAVY);
+  doc.rect(0, 0, PW, 18, 'F');
+  bold(11); setTxt(GOLD);
+  doc.text('HUDITA Business Readiness Assessment', ML, 11);
+  bold(9); setTxt([160,170,200]);
+  doc.text('Strength Analysis', PW - MR, 11, { align:'right' });
+
+  y = 30;
+  y = sectionHeader('STRENGTH ANALYSIS — TOP PERFORMING PILLARS', y, GREEN);
+
+  // Intro
+  normal(9); setTxt(GRAY6);
+  doc.text('The following pillars demonstrate the highest readiness scores and represent your competitive advantages.', ML, y);
+  y += 10;
+
+  // Strength table header
+  const strCols = [
+    { text:'#',        x:ML,      w:10  },
+    { text:'Pillar',   x:ML+10,   w:55  },
+    { text:'Score %',  x:ML+65,   w:25, align:'center' },
+    { text:'Impact',   x:ML+90,   w:CW-90 },
+  ];
+  y = tableRow(strCols, y, 8, true, false);
+
+  const impactMap = {
+    'Legalitas':         'Full legal compliance — operational disruption risk is minimal.',
+    'Tour Leader':       'Certified leadership capacity supports group management.',
+    'Jamaah Management': 'Strong pilgrim registration and care systems in place.',
+    'Hotel & Catering':  'Reliable accommodation partnerships secured.',
+    'Tiket & Transport': 'Flight and ground transport coverage established.',
+    'Sistem & Tech':     'Digital infrastructure supporting business automation.',
+  };
+
+  top3.forEach((p, i) => {
+    const rowCols = [
+      { text:String(i+1),        x:ML,    w:10  },
+      { text:p.name,             x:ML+10, w:55  },
+      { text:p.pct + '%',        x:ML+65, w:25, align:'center' },
+      { text:impactMap[p.name] || 'Strong performance noted across this pillar.', x:ML+90, w:CW-90 },
+    ];
+    y = tableRow(rowCols, y, 10, false, i%2===0);
+  });
+
+  y += 8;
+
+  // Visual strength bars — large
+  y = sectionHeader('PILLAR STRENGTH VISUALISATION', y, GREEN);
+  top3.forEach((p, i) => {
+    // Pillar label
+    bold(9); setTxt(NAVY);
+    doc.text(p.name, ML, y + 4.5);
+    normal(8); setTxt(GRAY4);
+    doc.text('Score: ' + p.pct + '%', ML + CW - 25, y + 4.5, { align:'right' });
+    // Bar
+    progressBar(ML, y + 7, CW, 6, p.pct, p.color, GRAY1);
+    // Score marker
+    setFill(p.color);
+    doc.circle(ML + CW * p.pct / 100, y + 10, 2, 'F');
+    y += 22;
+  });
+
+  y += 4;
+  y = sectionHeader('WHAT THESE STRENGTHS MEAN FOR YOUR BUSINESS', y, GREEN);
+  normal(9); setTxt(GRAY8);
+  const strengthNarrative = `Your top-performing pillars (${top3.map(p=>p.name).join(', ')}) provide a solid operational foundation. ` +
+    `With ${top3[0].name} leading at ${top3[0].pct}%, your business is well-positioned in this area. ` +
+    `Leverage these strengths when pitching to potential clients and partners. ` +
+    `Continue maintaining these pillars while accelerating development in weaker areas.`;
+  const strLines = doc.splitTextToSize(strengthNarrative, CW);
+  doc.text(strLines, ML, y);
+
+  footer('Page 3 of 7');
+
+  // ══════════════════════════════════════════════════════════
+  // PAGE 4 — IMPROVEMENT OPPORTUNITIES
+  // ══════════════════════════════════════════════════════════
+  doc.addPage();
+  setFill(NAVY);
+  doc.rect(0, 0, PW, 18, 'F');
+  bold(11); setTxt(GOLD);
+  doc.text('HUDITA Business Readiness Assessment', ML, 11);
+  bold(9); setTxt([160,170,200]);
+  doc.text('Improvement Opportunities', PW - MR, 11, { align:'right' });
+
+  y = 30;
+  y = sectionHeader('IMPROVEMENT OPPORTUNITIES — WEAKEST PILLARS', y, RED);
+
+  normal(9); setTxt(GRAY6);
+  doc.text('The following pillars require focused attention to improve overall business readiness.', ML, y);
+  y += 10;
+
+  // Improvement table
+  const impCols = [
+    { text:'#',         x:ML,      w:10  },
+    { text:'Category',  x:ML+10,   w:45  },
+    { text:'Score',     x:ML+55,   w:20, align:'center' },
+    { text:'Gap',       x:ML+75,   w:20, align:'center' },
+    { text:'Recommended Action',  x:ML+95, w:CW-95 },
+  ];
+  y = tableRow(impCols, y, 8, true, false);
+
+  const actionMap = {
+    'Legalitas':         'Renew PPIU certificate. Upload all legal documents immediately.',
+    'Tour Leader':       'Recruit 2 certified Tour Leaders. Use Vendor Directory to find candidates.',
+    'Jamaah Management': 'Activate CRM system. Download pilgrim management template.',
+    'Hotel & Catering':  'Confirm hotel rates for next season. Sign minimum 2 vendor contracts.',
+    'Tiket & Transport': 'Set up airline management account. Establish Garuda partnership.',
+    'Sistem & Tech':     'Implement digital CRM. Activate business management software tools.',
+  };
+
+  bottom3.forEach((p, i) => {
+    const gap = 100 - p.pct;
+    const rowCols = [
+      { text:String(i+1),                 x:ML,    w:10  },
+      { text:p.name,                      x:ML+10, w:45  },
+      { text:p.pct + '%',                 x:ML+55, w:20, align:'center' },
+      { text:'-' + gap + '%',             x:ML+75, w:20, align:'center' },
+      { text:actionMap[p.name] || 'Focus on core tasks for this pillar.', x:ML+95, w:CW-95 },
+    ];
+    y = tableRow(rowCols, y, 12, false, i%2===0);
+  });
+
+  y += 8;
+  y = sectionHeader('GAP ANALYSIS VISUALISATION', y, RED);
+
+  bottom3.forEach((p, i) => {
+    bold(9); setTxt(NAVY);
+    doc.text(p.name, ML, y + 4.5);
+    const gap = 100 - p.pct;
+    normal(8); setTxt(RED);
+    doc.text('Gap: ' + gap + '%', ML + CW - 20, y + 4.5, { align:'right' });
+    // Full bar (light gray)
+    setFill(GRAY1);
+    doc.roundedRect(ML, y + 7, CW, 7, 3, 3, 'F');
+    // Current fill
+    setFill(p.color);
+    doc.roundedRect(ML, y + 7, CW * p.pct / 100, 7, 3, 3, 'F');
+    // Gap fill (red tint)
+    setFill([254, 226, 226]);
+    doc.rect(ML + CW * p.pct / 100, y + 7, CW * gap / 100, 7, 'F');
+    // Labels
+    normal(7); setTxt(WHITE);
+    if (p.pct > 12) doc.text(p.pct + '%', ML + 3, y + 12.5);
+    setTxt(RED);
+    if (gap > 12) doc.text(gap + '% to go', ML + CW * p.pct / 100 + 3, y + 12.5);
+    y += 22;
+  });
+
+  y += 4;
+  y = sectionHeader('PRIORITY FOCUS RECOMMENDATION', y, RED);
+  normal(9); setTxt(GRAY8);
+  const impNarrative = `Immediate attention should be directed to ${weakestPillar.name} (${weakestPillar.pct}%), which represents the largest growth opportunity. ` +
+    `Completing the recommended actions for the bottom 3 pillars is estimated to add ${gainIfFocus + 10} points to your Readiness Score. ` +
+    `Follow the Action Plan on the next page for a structured improvement roadmap.`;
+  const impLines = doc.splitTextToSize(impNarrative, CW);
+  doc.text(impLines, ML, y);
+
+  footer('Page 4 of 7');
+
+  // ══════════════════════════════════════════════════════════
+  // PAGE 5 — ACTION PLAN
+  // ══════════════════════════════════════════════════════════
+  doc.addPage();
+  setFill(NAVY);
+  doc.rect(0, 0, PW, 18, 'F');
+  bold(11); setTxt(GOLD);
+  doc.text('HUDITA Business Readiness Assessment', ML, 11);
+  bold(9); setTxt([160,170,200]);
+  doc.text('Action Plan', PW - MR, 11, { align:'right' });
+
+  y = 30;
+  y = sectionHeader('STRUCTURED ACTION PLAN', y);
+
+  const actionPlan = [
+    {
+      phase: 'QUICK WINS  (0–30 Days)',
+      color: [46, 125, 82],
+      bg:    [232, 245, 238],
+      items: [
+        { task:'Upload all outstanding legal documents', pillar:'Legalitas', impact:'+15 pts' },
+        { task:'Verify and activate Tour Leader contacts', pillar:'Tour Leader', impact:'+8 pts' },
+        { task:'Download and customise pilgrim contract template', pillar:'Jamaah Mgmt', impact:'+5 pts' },
+        { task:'Book consultation with HUDITA advisor', pillar:'All Pillars', impact:'+10 pts' },
+      ],
+    },
+    {
+      phase: 'MID-TERM  (30–90 Days)',
+      color: [201, 168, 76],
+      bg:    [245, 237, 214],
+      items: [
+        { task:'Confirm hotel & catering contracts for next season', pillar:'Hotel & Catering', impact:'+20 pts' },
+        { task:'Set up airline management account (Garuda partnership)', pillar:'Tiket & Transport', impact:'+18 pts' },
+        { task:'Recruit 2 additional certified Tour Leaders', pillar:'Tour Leader', impact:'+15 pts' },
+        { task:'Activate CRM system for pilgrim management', pillar:'Jamaah Mgmt', impact:'+12 pts' },
+      ],
+    },
+    {
+      phase: 'LONG-TERM  (90–180 Days)',
+      color: [22, 38, 80],
+      bg:    [238, 240, 246],
+      items: [
+        { task:'Renew PPIU certificate (47-day deadline)', pillar:'Legalitas', impact:'+25 pts' },
+        { task:'Implement full digital management system', pillar:'Sistem & Tech', impact:'+30 pts' },
+        { task:'Expand vendor network to 5+ verified partners', pillar:'Hotel & Catering', impact:'+20 pts' },
+        { task:'Achieve all 6 platform achievements', pillar:'All Pillars', impact:'+30 pts' },
+      ],
+    },
+  ];
+
+  actionPlan.forEach(phase => {
+    // Phase header band
+    setFill(phase.color);
+    doc.roundedRect(ML, y, CW, 9, 3, 3, 'F');
+    bold(8.5); setTxt(WHITE);
+    doc.text(phase.phase, ML + 5, y + 6);
+    y += 11;
+
+    // Phase items table
+    const phaseCols = [
+      { text:'Action Item',    x:ML,      w:90  },
+      { text:'Pillar',         x:ML+90,   w:45  },
+      { text:'Est. Impact',    x:ML+135,  w:CW-135, align:'right' },
+    ];
+    y = tableRow(phaseCols, y, 7, true, false);
+
+    phase.items.forEach((item, i) => {
+      const itemCols = [
+        { text:item.task,   x:ML,     w:90 },
+        { text:item.pillar, x:ML+90,  w:45 },
+        { text:item.impact, x:ML+135, w:CW-135, align:'right' },
+      ];
+      y = tableRow(itemCols, y, 8, false, i%2===0);
+    });
+    y += 6;
+  });
+
+  footer('Page 5 of 7');
+
+  // ══════════════════════════════════════════════════════════
+  // PAGE 6 — BUSINESS PROJECTION
+  // ══════════════════════════════════════════════════════════
+  doc.addPage();
+  setFill(NAVY);
+  doc.rect(0, 0, PW, 18, 'F');
+  bold(11); setTxt(GOLD);
+  doc.text('HUDITA Business Readiness Assessment', ML, 11);
+  bold(9); setTxt([160,170,200]);
+  doc.text('Business Projection', PW - MR, 11, { align:'right' });
+
+  y = 30;
+  y = sectionHeader('BUSINESS PROJECTION SIMULATION', y);
+
+  // State comparison cards
+  const cardW = (CW - 10) / 2;
+  // Current state card
+  setFill(GRAY1);
+  doc.roundedRect(ML, y, cardW, 55, 5, 5, 'F');
+  bold(8); setTxt(GRAY4);
+  doc.text('CURRENT STATE', ML + 5, y + 8);
+  bold(28); setTxt(NAVY);
+  doc.text(String(score), ML + 5, y + 26);
+  normal(9); setTxt(GRAY6);
+  doc.text('/ 1000  ·  ' + scoreLabel, ML + 5, y + 33);
+  normal(8); setTxt(GRAY6);
+  doc.text('Level: ' + lvInfo.label, ML + 5, y + 41);
+  doc.text('Avg Pillar: ' + avgPillar + '%', ML + 5, y + 48);
+
+  // Arrow
+  bold(18); setTxt(GOLD);
+  doc.text('→', ML + cardW + 2, y + 30, { align:'center' });
+
+  // Projected state card
+  setFill(NAVY);
+  doc.roundedRect(ML + cardW + 10, y, cardW, 55, 5, 5, 'F');
+  bold(8); setTxt(GOLD);
+  doc.text('PROJECTED STATE', ML + cardW + 15, y + 8);
+  bold(28); setTxt(GOLDL);
+  doc.text(String(projectedScore), ML + cardW + 15, y + 26);
+  normal(9); setTxt([180,200,230]);
+  doc.text('/ 1000  ·  ' + projectedStage.split('—')[0].trim(), ML + cardW + 15, y + 33);
+  normal(8); setTxt([150,170,210]);
+  doc.text('Stage: ' + projectedStage, ML + cardW + 15, y + 41);
+  doc.text('Est. Gain: +' + (projectedScore - score) + ' pts  ·  Growth: +' + growthPct + '%', ML + cardW + 15, y + 48);
+
+  y += 62;
+
+  // Growth projection bar
+  y = sectionHeader('SCORE PROGRESSION FORECAST', y);
+
+  const scenarios = [
+    { label:'Current Score',     value:score,          color:GRAY4 },
+    { label:'30-Day Projection', value:Math.min(1000,score+30), color:[46,125,82] },
+    { label:'90-Day Projection', value:Math.min(1000,score+65), color:GOLD },
+    { label:'180-Day Projection',value:projectedScore,  color:NAVY },
+  ];
+  scenarios.forEach((s, i) => {
+    bold(8); setTxt(NAVY);
+    doc.text(s.label, ML, y + 5);
+    normal(8); setTxt(s.color);
+    doc.text(String(s.value) + ' / 1000', ML + CW - 20, y + 5, { align:'right' });
+    progressBar(ML, y + 7, CW, 7, s.value / 10, s.color, GRAY1);
+    y += 18;
+  });
+
+  y += 4;
+
+  // Pillar projection table
+  y = sectionHeader('PILLAR-LEVEL PROJECTION', y);
+  const projCols = [
+    { text:'Pillar',        x:ML,      w:55 },
+    { text:'Current',       x:ML+55,   w:30, align:'center' },
+    { text:'Projected',     x:ML+85,   w:30, align:'center' },
+    { text:'Growth',        x:ML+115,  w:25, align:'center' },
+    { text:'Priority',      x:ML+140,  w:CW-140 },
+  ];
+  y = tableRow(projCols, y, 8, true, false);
+
+  pillars.forEach((p, i) => {
+    const proj   = Math.min(100, p.pct + Math.round((100 - p.pct) * 0.35));
+    const growth = proj - p.pct;
+    const priority = p.pct < 60 ? 'HIGH' : p.pct < 80 ? 'MEDIUM' : 'MAINTAIN';
+    const rowCols = [
+      { text:p.name,          x:ML,      w:55 },
+      { text:p.pct + '%',     x:ML+55,   w:30, align:'center' },
+      { text:proj + '%',      x:ML+85,   w:30, align:'center' },
+      { text:'+' + growth + '%', x:ML+115, w:25, align:'center' },
+      { text:priority,        x:ML+140,  w:CW-140 },
+    ];
+    y = tableRow(rowCols, y, 8, false, i%2===0);
+  });
+
+  footer('Page 6 of 7');
+
+  // ══════════════════════════════════════════════════════════
+  // PAGE 7 — FINAL RECOMMENDATION
+  // ══════════════════════════════════════════════════════════
+  doc.addPage();
+  setFill(NAVY);
+  doc.rect(0, 0, PW, 18, 'F');
+  bold(11); setTxt(GOLD);
+  doc.text('HUDITA Business Readiness Assessment', ML, 11);
+  bold(9); setTxt([160,170,200]);
+  doc.text('Final Recommendation', PW - MR, 11, { align:'right' });
+
+  y = 30;
+  y = sectionHeader('FINAL RECOMMENDATION', y);
+
+  // Main recommendation box
+  setFill(NAVY);
+  doc.roundedRect(ML, y, CW, 50, 5, 5, 'F');
+  setFill(GOLD);
+  doc.roundedRect(ML, y, CW, 10, 5, 5, 'F');
+  doc.rect(ML, y+5, CW, 5, 'F');
+  bold(10); setTxt(NAVY);
+  doc.text('HUDITA ADVISOR RECOMMENDATION', ML + 6, y + 7);
+  normal(9.5); setTxt([210,220,240]);
+  const finalRec = advisorRec || `Focus on strengthening ${weakestPillar.name} and completing outstanding tasks across all 6 pillars to accelerate your Readiness Score toward ${projectedScore}.`;
+  const finalLines = doc.splitTextToSize(finalRec, CW - 12);
+  doc.text(finalLines, ML + 6, y + 18);
+  bold(8); setTxt(GOLD);
+  doc.text('Advisor Phase: ' + advisorPriority, ML + 6, y + 44);
+  y += 58;
+
+  // Summary scorecard
+  y = sectionHeader('SCORECARD SUMMARY', y);
+  const scoreCols = [
+    { text:'Area',           x:ML,     w:70 },
+    { text:'Value',          x:ML+70,  w:50 },
+    { text:'Recommendation', x:ML+120, w:CW-120 },
+  ];
+  y = tableRow(scoreCols, y, 8, true, false);
+  const summaryRows = [
+    ['Readiness Score',   score + ' / 1000',             scoreLabel + ' — keep improving'],
+    ['Strongest Pillar',  top3[0].name + ' (' + top3[0].pct + '%)', 'Leverage as competitive advantage'],
+    ['Weakest Pillar',    weakestPillar.name + ' (' + weakestPillar.pct + '%)', 'Prioritise immediately'],
+    ['XP & Level',        'Lv ' + lvInfo.level + ' · ' + lvInfo.label, 'Earn XP through daily actions'],
+    ['Achievement Score', achCount + ' / ' + achTotal + ' (' + Math.round(achCount/achTotal*100) + '%)', 'Complete remaining achievements'],
+    ['Projected Score',   '~' + projectedScore + ' / 1000', '+' + (projectedScore - score) + ' pts potential gain'],
+  ];
+  summaryRows.forEach((row, i) => {
+    const rowCols = [
+      { text:row[0], x:ML,     w:70 },
+      { text:row[1], x:ML+70,  w:50 },
+      { text:row[2], x:ML+120, w:CW-120 },
+    ];
+    y = tableRow(rowCols, y, 9, false, i%2===0);
+  });
+
+  y += 10;
+  y = sectionHeader('CLOSING NOTE', y);
+  normal(9); setTxt(GRAY8);
+  const closingNote = `This report was generated automatically by the HUDITA platform based on your current activity, pillar progress, and advisor engine analysis. ` +
+    `The projections are estimates based on consistent engagement with the recommended actions. ` +
+    `For personalised guidance, book a consultation with a HUDITA-certified expert. ` +
+    `Continue your journey from Makkah to Madinah — your next milestone awaits.`;
+  const closingLines = doc.splitTextToSize(closingNote, CW);
+  doc.text(closingLines, ML, y);
+  y += closingLines.length * 5 + 10;
+
+  // Sign-off block
+  setFill(GOLD);
+  doc.roundedRect(ML, y, CW, 22, 5, 5, 'F');
+  bold(12); setTxt(NAVY);
+  doc.text('HUDITA', ML + 8, y + 10);
+  normal(8); setTxt(NAVYM);
+  doc.text('Business Readiness Platform  ·  by MAFIRA', ML + 8, y + 17);
+  bold(9); setTxt(NAVYM);
+  doc.text('hudita.mafira.co', ML + CW - 5, y + 10, { align:'right' });
+  normal(8); setTxt(NAVYM);
+  doc.text('Report generated: ' + now, ML + CW - 5, y + 17, { align:'right' });
+
+  footer('Page 7 of 7');
+
+  // ── Save ──────────────────────────────────────────────────
+  const safeName = businessName.replace(/[^a-zA-Z0-9]/g, '_');
+  doc.save('HUDITA_Report_' + safeName + '.pdf');
+
+  if (btn) { btn.innerHTML = '<svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="13" y2="17"/></svg> Export PDF'; btn.disabled = false; }
+  if (typeof showToast === 'function') showToast('📄 PDF berhasil diexport!');
+  if (typeof addActivity === 'function') addActivity('📄', 'Executive Report diekspor ke PDF');
+}
+
+// ===== PHASE 9 START =====
+// ─── PORTFOLIO MANAGER — HUDITA Phase 9 ──────────────────────
+
+const PORTFOLIO_KEY = 'hudita_portfolio';
+const P9_ACTIVE_KEY = 'hudita_portfolio_active';
+
+// Industry → emoji
+function p9Icon(industry) {
+  const map = {
+    'Umrah & Haji':'🕋','Wisata Halal':'🌙','Pendidikan Islam':'📖',
+    'Kuliner Halal':'🍱','Fashion Muslim':'👗','Keuangan Syariah':'💰',
+    'Properti Syariah':'🏠','Kesehatan Islami':'☪️','Lainnya':'🏢'
+  };
+  return map[industry] || '🏢';
+}
+
+// Score → level badge config
+function p9Level(score) {
+  if (score >= 900) return { label:'Master',     bg:'#FFF8E7', color:'#B45309' };
+  if (score >= 750) return { label:'Mahir',      bg:'#ECFDF5', color:'#2E7D52' };
+  if (score >= 600) return { label:'Berkembang', bg:'#EFF6FF', color:'#1D4ED8' };
+  if (score >= 400) return { label:'Pemula',     bg:'#F5F3FF', color:'#6D28D9' };
+  return                   { label:'Starter',    bg:'#F3F4F6', color:'#4B5563' };
+}
+
+// Status badge
+function p9StatusBadge(status) {
+  const map = {
+    'Aktif':        { bg:'#ECFDF5', color:'#2E7D52' },
+    'Persiapan':    { bg:'#FEF3C7', color:'#B45309' },
+    'Ditangguhkan': { bg:'#FEE2E2', color:'#991B1B' },
+  };
+  const s = map[status] || { bg:'#F3F4F6', color:'#4B5563' };
+  return '<span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;background:' + s.bg + ';color:' + s.color + '">' + (status||'Aktif') + '</span>';
+}
+
+// ── localStorage helpers ─────────────────────────────
+function p9Load() {
+  try {
+    const raw = localStorage.getItem(PORTFOLIO_KEY);
+    if (raw) return JSON.parse(raw);
+  } catch(e) {}
+  return [];
+}
+function p9Save(list) {
+  try { localStorage.setItem(PORTFOLIO_KEY, JSON.stringify(list)); } catch(e) {}
+}
+function p9LoadActiveId() {
+  return localStorage.getItem(P9_ACTIVE_KEY) || null;
+}
+function p9SaveActiveId(id) {
+  if (id) localStorage.setItem(P9_ACTIVE_KEY, id);
+  else localStorage.removeItem(P9_ACTIVE_KEY);
+}
+
+// ── State ────────────────────────────────────────────
+let p9List     = p9Load();
+let p9ActiveId = p9LoadActiveId();
+
+function p9GetActive() {
+  return p9List.find(b => b.id === p9ActiveId) || null;
+}
+
+// ── Stats ────────────────────────────────────────────
+function p9RenderStats() {
+  const total = p9List.length;
+  const scores = p9List.map(b => b.readinessScore || 0);
+  const avg  = total ? Math.round(scores.reduce((a,b)=>a+b,0)/total) : null;
+  const high = total ? Math.max(...scores) : null;
+  const low  = total ? Math.min(...scores) : null;
+  const highBiz = high !== null ? p9List.find(b => b.readinessScore === high) : null;
+  const lowBiz  = low  !== null ? p9List.find(b => b.readinessScore === low)  : null;
+
+  const ge = id => document.getElementById(id);
+  if (ge('p9StatTotal')) ge('p9StatTotal').textContent = total;
+  if (ge('p9StatAvg'))   ge('p9StatAvg').textContent   = avg !== null ? avg : '—';
+  if (ge('p9StatHigh'))  ge('p9StatHigh').textContent  = high !== null ? high : '—';
+  if (ge('p9StatLow'))   ge('p9StatLow').textContent   = low  !== null ? low  : '—';
+  if (ge('p9StatHighName')) ge('p9StatHighName').textContent = highBiz ? highBiz.name : '—';
+  if (ge('p9StatLowName'))  ge('p9StatLowName').textContent  = lowBiz  ? lowBiz.name  : '—';
+  if (ge('p9ListCount'))    ge('p9ListCount').textContent    = total + (total === 1 ? ' bisnis' : ' bisnis');
+
+  // Active banner
+  const banner = ge('p9ActiveBanner');
+  const active = p9GetActive();
+  if (banner) {
+    if (active) {
+      banner.style.display = 'flex';
+      if (ge('p9ActiveIcon'))     ge('p9ActiveIcon').textContent     = p9Icon(active.industry);
+      if (ge('p9ActiveName'))     ge('p9ActiveName').textContent     = active.name;
+      if (ge('p9ActiveMeta'))     ge('p9ActiveMeta').textContent     = active.industry + ' · ' + (active.status || 'Aktif') + ' · ' + p9Level(active.readinessScore || 0).label;
+      if (ge('p9ActiveScoreVal')) ge('p9ActiveScoreVal').textContent = active.readinessScore || 0;
+    } else {
+      banner.style.display = 'none';
+    }
+  }
+}
+
+// ── Render list ──────────────────────────────────────
+function p9RenderList() {
+  const container = document.getElementById('p9BizList');
+  if (!container) return;
+
+  if (p9List.length === 0) {
+    container.innerHTML =
+      '<div class="p9-empty">' +
+        '<div class="p9-empty-icon">📁</div>' +
+        '<div class="p9-empty-title">Belum Ada Bisnis</div>' +
+        '<div class="p9-empty-desc">Tambahkan bisnis pertama untuk memulai<br>perjalanan menuju Madinah.</div>' +
+        '<button class="p9-add-btn" onclick="p9OpenModal()" style="margin:0 auto">Tambah Bisnis</button>' +
+      '</div>';
+    return;
+  }
+
+  container.innerHTML = p9List.map(biz => {
+    const isActive = biz.id === p9ActiveId;
+    const lv       = p9Level(biz.readinessScore || 0);
+    const created  = biz.createdAt ? new Date(biz.createdAt).toLocaleDateString('id-ID',{day:'2-digit',month:'short',year:'numeric'}) : '—';
+    const updated  = biz.updatedAt ? new Date(biz.updatedAt).toLocaleDateString('id-ID',{day:'2-digit',month:'short',year:'numeric'}) : created;
+    return (
+      '<div class="p9-biz-card' + (isActive ? ' p9-active' : '') + '" id="p9card_' + biz.id + '">' +
+        '<div class="p9-biz-icon">' + p9Icon(biz.industry) + '</div>' +
+        '<div class="p9-biz-info">' +
+          '<div class="p9-biz-name">' + p9Esc(biz.name) + '</div>' +
+          '<div class="p9-biz-sub">' + p9Esc(biz.industry) + ' · Last update: ' + updated + '</div>' +
+          '<div style="margin-top:5px;display:flex;gap:5px;align-items:center;flex-wrap:wrap">' +
+            p9StatusBadge(biz.status) +
+            '<span class="p9-biz-badge" style="background:' + lv.bg + ';color:' + lv.color + '">' + lv.label + '</span>' +
+          '</div>' +
+        '</div>' +
+        '<div class="p9-biz-score">' +
+          '<div class="p9-biz-score-val">' + (biz.readinessScore || 0) + '</div>' +
+          '<div style="font-size:10px;color:var(--gray-400)">/1000</div>' +
+        '</div>' +
+        '<div class="p9-biz-actions">' +
+          (isActive
+            ? '<button class="p9-btn-select" disabled style="opacity:.8">✓ Aktif</button>'
+            : '<button class="p9-btn-select" onclick="p9SelectBusiness(\'' + biz.id + '\')">Pilih</button>'
+          ) +
+          '<button class="p9-btn-icon" onclick="p9OpenEditModal(\'' + biz.id + '\')" title="Edit">' +
+            '<svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4z"/></svg>' +
+          '</button>' +
+          '<button class="p9-btn-icon p9-del" onclick="p9DeleteBusiness(\'' + biz.id + '\')" title="Hapus">' +
+            '<svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>' +
+          '</button>' +
+        '</div>' +
+      '</div>'
+    );
+  }).join('');
+}
+
+function p9Render() { p9RenderStats(); p9RenderList(); }
+
+// Helper: escape HTML
+function p9Esc(str) {
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ── CRUD ─────────────────────────────────────────────
+function p9AddBusiness(name, industry, status) {
+  const now = new Date().toISOString();
+  const biz = { id:'p9_' + Date.now(), name, industry, status: status||'Aktif', readinessScore:0, createdAt:now, updatedAt:now };
+  p9List.push(biz);
+  p9Save(p9List);
+  // Auto-select if first
+  if (p9List.length === 1) { p9ActiveId = biz.id; p9SaveActiveId(biz.id); p9ApplyActiveToUI(); }
+  p9Render();
+  if (typeof showToast === 'function') showToast('🏢 Bisnis "' + name + '" ditambahkan!');
+  if (typeof addActivity === 'function') addActivity('🏢', name + ' — ditambahkan ke portfolio');
+}
+
+function p9EditBusiness(id, name, industry, status) {
+  const biz = p9List.find(b => b.id === id);
+  if (!biz) return;
+  biz.name = name; biz.industry = industry; biz.status = status || 'Aktif';
+  biz.updatedAt = new Date().toISOString();
+  const lv = p9Level(biz.readinessScore || 0);
+  p9Save(p9List);
+  if (id === p9ActiveId) p9ApplyActiveToUI();
+  p9Render();
+  if (typeof showToast === 'function') showToast('✏️ Bisnis diperbarui!');
+}
+
+function p9DeleteBusiness(id) {
+  const biz = p9List.find(b => b.id === id);
+  if (!biz) return;
+  if (!confirm('Hapus bisnis "' + biz.name + '"? Tindakan ini tidak dapat diurungkan.')) return;
+  p9List = p9List.filter(b => b.id !== id);
+  if (p9ActiveId === id) {
+    p9ActiveId = p9List.length ? p9List[0].id : null;
+    p9SaveActiveId(p9ActiveId);
+    p9ApplyActiveToUI();
+  }
+  p9Save(p9List);
+  p9Render();
+  if (typeof showToast === 'function') showToast('🗑️ Bisnis dihapus.');
+}
+
+function p9SelectBusiness(id) {
+  const biz = p9List.find(b => b.id === id);
+  if (!biz || id === p9ActiveId) return;
+  p9ActiveId = id;
+  p9SaveActiveId(id);
+  p9ApplyActiveToUI();
+  p9Render();
+  if (typeof showToast === 'function') showToast('✅ Bisnis aktif: ' + biz.name);
+  if (typeof addActivity === 'function') addActivity('🔄', 'Beralih ke bisnis: ' + biz.name);
+}
+
+// ── Apply active business to dashboard UI ────────────
+function p9ApplyActiveToUI() {
+  const biz = p9GetActive();
+  if (!biz) return;
+  // Sidebar user card
+  const nameEl = document.querySelector('.user-info .name');
+  const roleEl = document.querySelector('.user-info .role');
+  if (nameEl) nameEl.textContent = biz.name;
+  if (roleEl) roleEl.textContent = biz.industry + ' · ' + (biz.status || 'Aktif');
+  // Avatar initials
+  document.querySelectorAll('.avatar').forEach(av => {
+    const words = biz.name.trim().split(/\s+/);
+    av.textContent = ((words[0]||'')[0]||('')).toUpperCase() + ((words[1]||words[0]||'')[words[1]?0:1]||'').toUpperCase();
+  });
+  // Report subtitle
+  const rptDate = document.getElementById('rptDate');
+  if (rptDate) rptDate.textContent = 'HUDITA · ' + biz.name;
+}
+
+// ── Modal ─────────────────────────────────────────────
+function p9OpenModal() {
+  document.getElementById('p9ModalTitle').textContent = 'Tambah Bisnis Baru';
+  document.getElementById('p9InputName').value     = '';
+  document.getElementById('p9InputIndustry').value = '';
+  document.getElementById('p9InputStatus').value   = 'Aktif';
+  document.getElementById('p9EditId').value        = '';
+  document.getElementById('p9BtnSave').textContent = 'Simpan';
+  document.getElementById('p9ModalOverlay').classList.add('p9-open');
+  setTimeout(() => document.getElementById('p9InputName').focus(), 60);
+}
+
+function p9OpenEditModal(id) {
+  const biz = p9List.find(b => b.id === id);
+  if (!biz) return;
+  document.getElementById('p9ModalTitle').textContent = 'Edit Bisnis';
+  document.getElementById('p9InputName').value     = biz.name;
+  document.getElementById('p9InputIndustry').value = biz.industry;
+  document.getElementById('p9InputStatus').value   = biz.status || 'Aktif';
+  document.getElementById('p9EditId').value        = id;
+  document.getElementById('p9BtnSave').textContent = 'Update';
+  document.getElementById('p9ModalOverlay').classList.add('p9-open');
+  setTimeout(() => document.getElementById('p9InputName').focus(), 60);
+}
+
+function p9CloseModal() {
+  document.getElementById('p9ModalOverlay').classList.remove('p9-open');
+}
+
+function p9SaveBusiness() {
+  const name     = (document.getElementById('p9InputName').value || '').trim();
+  const industry = document.getElementById('p9InputIndustry').value;
+  const status   = document.getElementById('p9InputStatus').value;
+  const editId   = document.getElementById('p9EditId').value;
+  if (!name)     { if (typeof showToast === 'function') showToast('⚠️ Nama bisnis wajib diisi.'); document.getElementById('p9InputName').focus(); return; }
+  if (!industry) { if (typeof showToast === 'function') showToast('⚠️ Pilih industri terlebih dahulu.'); document.getElementById('p9InputIndustry').focus(); return; }
+  if (editId) { p9EditBusiness(editId, name, industry, status); }
+  else        { p9AddBusiness(name, industry, status); }
+  p9CloseModal();
+}
+
+// Keyboard shortcuts for the portfolio modal
+document.addEventListener('keydown', function(e) {
+  const overlay = document.getElementById('p9ModalOverlay');
+  if (!overlay || !overlay.classList.contains('p9-open')) return;
+  if (e.key === 'Escape') p9CloseModal();
+  if (e.key === 'Enter' && document.activeElement && document.activeElement.tagName !== 'SELECT') p9SaveBusiness();
+});
+
+// ── Bootstrap ────────────────────────────────────────
+(function p9Init() {
+  p9Render();
+  if (p9ActiveId && p9GetActive()) p9ApplyActiveToUI();
+})();
+
+// ===== PHASE 9 END =====
 </script>
+<!-- ═══════════════════════════════════════════════════
+     EXECUTIVE READINESS REPORT MODAL — HUDITA Phase 7
+     ═══════════════════════════════════════════════════ -->
+<div id="reportModalOverlay" onclick="if(event.target===this)closeExecutiveReport()">
+  <div id="reportModal" role="dialog" aria-modal="true" aria-labelledby="rptTitle">
+
+    <!-- Header -->
+    <div class="rpt-header">
+      <div class="rpt-header-left">
+        <div class="rpt-header-icon">📊</div>
+        <div>
+          <div class="rpt-header-title" id="rptTitle">Executive Readiness Report</div>
+          <div class="rpt-header-sub" id="rptDate">HUDITA · MAFIRA Demo Agency</div>
+        </div>
+      </div>
+      <button class="rpt-close" onclick="closeExecutiveReport()" aria-label="Close">✕</button>
+    </div>
+
+    <!-- Body -->
+    <div class="rpt-body" id="reportBody">
+      <div style="text-align:center;padding:40px 0;color:var(--gray-400)">
+        <div style="font-size:32px;margin-bottom:8px">📄</div>
+        <div style="font-size:14px">Generating report…</div>
+      </div>
+    </div>
+
+    <!-- Footer actions -->
+    <div class="rpt-footer">
+      <button class="rpt-btn rpt-btn-outline" onclick="copyReport()">
+        <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        Copy Report
+      </button>
+      <button class="rpt-btn rpt-btn-outline" onclick="downloadReport()">
+        <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Download TXT
+      </button>
+      <button class="rpt-btn rpt-btn-outline rpt-btn-pdf" id="exportPdfBtn" onclick="exportPDF()">
+        <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="13" y2="17"/></svg>
+        Export PDF
+      </button>
+      <button class="rpt-btn rpt-btn-primary" onclick="closeExecutiveReport()">
+        <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+        Done
+      </button>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
