@@ -803,6 +803,172 @@ body { font-family: 'Inter', sans-serif; background: var(--gray-50); color: var(
 }
 .p9-btn-save:hover { opacity:.88; }
 /* ===== PHASE 9 END ===== */
+
+/* ===== PHASE 9.5 MOBILE FIX START ===== */
+
+/* ── 0. GLOBAL ANTI-OVERFLOW ───────────────────────── */
+html,
+body {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+* { box-sizing: border-box; }
+
+#app { width: 100%; max-width: 100%; overflow-x: hidden; }
+.main { width: 100%; max-width: 100%; overflow-x: hidden; }
+.content { width: 100%; max-width: 100%; overflow-x: hidden; }
+
+img, svg, video, canvas { max-width: 100%; }
+
+/* ── 1. CARDS — force full-width, no overflow ──────── */
+.card, .pillar-card, .action-card, .p9-stat-card, .p9-biz-card,
+.advisor-card, .journey-card, .p9-active-banner, .modal-box,
+.p9-modal-box, #reportModal {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+/* ── 2. BUTTONS — never force overflow, wrap if needed ── */
+button, .topbar-btn, .gen-report-btn, .p9-add-btn, .rpt-btn,
+.modal-btn, .p9-btn-cancel, .p9-btn-save, .adv-action-btn {
+  max-width: 100%;
+  white-space: normal;
+}
+.rpt-footer, .p9-modal-footer, .modal-footer {
+  flex-wrap: wrap;
+}
+
+/* ── 3. RESPONSIVE TABLE WRAPPER (internal scroll only) ── */
+.table-responsive {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.table-responsive table { min-width: 480px; }
+
+/* ── 4. MOBILE BREAKPOINT (≤768px) ─────────────────── */
+@media (max-width: 768px) {
+
+  html, body { overflow-x: hidden; width: 100%; }
+
+  /* App shell */
+  .app { flex-direction: column; }
+  .main, .content, #app { max-width: 100vw; }
+  .content { padding: 14px; padding-bottom: 84px; }
+
+  /* ── Topbar: logo / lang / dark mode / notif stay tidy ── */
+  .topbar {
+    padding: 0 10px;
+    gap: 6px;
+    overflow: hidden;
+  }
+  .topbar-left { gap: 8px; min-width: 0; flex: 1 1 auto; overflow: hidden; }
+  .page-title {
+    font-size: 14px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .topbar-right {
+    gap: 5px;
+    flex-shrink: 0;
+  }
+  .topbar-btn { width: 32px; height: 32px; font-size: 12px; }
+  .lang-select {
+    padding: 5px 6px;
+    font-size: 11px;
+    max-width: 86px;
+  }
+  .avatar { width: 30px; height: 30px; font-size: 11px; }
+
+  /* ── Hero "Makkah → Madinah" journey card ── */
+  .journey-card {
+    padding: 16px 14px;
+    width: 100%;
+    max-width: 100%;
+    overflow: hidden;
+  }
+  .journey-title { font-size: 19px; }
+  .journey-stage { font-size: 12px; margin-bottom: 18px; }
+  .journey-card > div[style*="max-width:420px"] {
+    max-width: 100% !important;
+  }
+  .journey-road { margin-bottom: 14px; }
+  .journey-cities {
+    flex-wrap: wrap;
+    gap: 6px 4px;
+    font-size: 9px;
+    justify-content: space-between;
+  }
+  .journey-cities span {
+    flex: 1 1 18%;
+    min-width: 0;
+    word-break: break-word;
+  }
+  .journey-cities span:first-child { text-align: left; }
+  .journey-cities span:last-child { text-align: right; }
+  .journey-pct {
+    position: static;
+    transform: none;
+    margin-top: 10px;
+    font-size: 30px;
+    text-align: right;
+  }
+
+  /* ── All dashboard cards full width ── */
+  .card, .pillar-card, .action-card, .advisor-card { padding: 16px; }
+  .grid-6, .grid-4, .grid-3, .grid-2 { width: 100%; max-width: 100%; }
+  .score-ring-wrap { flex-wrap: wrap; gap: 14px; }
+
+  /* ── All buttons wrap instead of overflowing ── */
+  .gen-report-btn, .p9-add-btn { width: 100%; justify-content: center; }
+  .rpt-footer { padding: 12px 16px; }
+  .rpt-footer .rpt-btn { flex: 1 1 100%; justify-content: center; }
+
+  /* ── Sidebar (off-canvas drawer on mobile) ── */
+  .sidebar { max-width: 84vw; }
+
+  /* ── Portfolio page ── */
+  .p9-page-header { flex-direction: column; align-items: stretch; }
+  .p9-add-btn { width: 100%; }
+  .p9-stats-row { grid-template-columns: 1fr 1fr !important; }
+  .p9-biz-card {
+    flex-wrap: wrap;
+    align-items: flex-start;
+    padding: 14px;
+  }
+  .p9-biz-info { flex: 1 1 100%; min-width: 0; order: 1; }
+  .p9-biz-icon { order: 0; }
+  .p9-biz-score { flex: 1 1 auto; text-align: left; margin-right: 0; order: 2; }
+  .p9-biz-actions { flex: 1 1 100%; justify-content: flex-start; order: 3; margin-top: 8px; }
+  .p9-active-banner { flex-wrap: wrap; }
+  .p9-active-score { width: 100%; text-align: left; margin-top: 6px; }
+
+  /* ── Modals ── */
+  .modal-box, .p9-modal-box, #reportModal {
+    max-width: 95vw !important;
+    width: 95vw !important;
+  }
+  .rpt-header { padding: 16px 18px; }
+  .rpt-body { padding: 16px 18px; }
+  .rpt-score-row { flex-wrap: wrap; }
+  .rpt-score-pill { flex: 1 1 45%; }
+
+  /* ── Profile / settings blocks ── */
+  .p9-field input, .p9-field select { font-size: 13px; }
+}
+
+@media (max-width: 480px) {
+  .journey-pct { font-size: 26px; }
+  .journey-cities { font-size: 8.5px; }
+  .p9-stats-row { grid-template-columns: 1fr 1fr !important; }
+  .rpt-score-pill { flex: 1 1 100%; }
+}
+
+/* ===== PHASE 9.5 MOBILE FIX END ===== */
 </style>
 </head>
 <body>
@@ -4064,6 +4230,89 @@ document.addEventListener('keydown', function(e) {
     </div>
   </div>
 </div>
+
+<!-- ===== PHASE 9.5 MOBILE FIX START ===== -->
+<script>
+/*
+  fixMobileViewport()
+  ────────────────────────────────────────────────────────
+  Mobile-only auto-correction pass. Does not touch any
+  Phase 1–9 feature logic — purely defensive layout fixes
+  so nothing can ever cause horizontal scrolling/overflow
+  on small screens (320px–768px wide).
+*/
+function fixMobileViewport() {
+  try {
+    var isMobile = window.innerWidth <= 768;
+
+    // Always keep html/body clamped — cheap, always safe.
+    document.documentElement.style.maxWidth = '100%';
+    document.documentElement.style.overflowX = 'hidden';
+    document.body.style.maxWidth = '100%';
+    document.body.style.overflowX = 'hidden';
+
+    if (!isMobile) return;
+
+    var viewportWidth = window.innerWidth;
+
+    // Scan top-level layout containers + cards + buttons for
+    // anything wider than the viewport and clamp it back.
+    var selectors = [
+      '.app', '.main', '.content', '.topbar',
+      '.card', '.pillar-card', '.action-card',
+      '.advisor-card', '.journey-card', '.p9-active-banner',
+      '.p9-stat-card', '.p9-biz-card', '.grid-6', '.grid-4',
+      '.grid-3', '.grid-2', '.p9-stats-row',
+      '.modal-box', '.p9-modal-box', '#reportModal',
+      'button', '.topbar-btn', '.gen-report-btn', '.p9-add-btn'
+    ];
+
+    selectors.forEach(function (sel) {
+      var nodes = document.querySelectorAll(sel);
+      nodes.forEach(function (el) {
+        var rect = el.getBoundingClientRect();
+        if (rect.width > viewportWidth) {
+          el.style.maxWidth = '100%';
+          el.style.boxSizing = 'border-box';
+        }
+        // If an element's right edge pokes past the viewport
+        // (e.g. caused by a stray inline width/margin), pull it back.
+        if (rect.right > viewportWidth + 1) {
+          el.style.maxWidth = '100%';
+        }
+      });
+    });
+
+    // Defensive sweep: any element directly causing document
+    // to be wider than the viewport gets clamped too.
+    var docWidth = document.documentElement.scrollWidth;
+    if (docWidth > viewportWidth) {
+      var all = document.querySelectorAll('body *');
+      all.forEach(function (el) {
+        var r = el.getBoundingClientRect();
+        if (r.width > viewportWidth + 1) {
+          el.style.maxWidth = '100%';
+          el.style.boxSizing = 'border-box';
+        }
+      });
+    }
+  } catch (e) {
+    // Never let the safety net itself break the app.
+    console.warn('fixMobileViewport skipped:', e);
+  }
+}
+
+document.addEventListener('DOMContentLoaded', fixMobileViewport);
+window.addEventListener('resize', fixMobileViewport);
+window.addEventListener('orientationchange', fixMobileViewport);
+
+// Also run once after the loading screen / page transitions settle,
+// since dashboard content renders dynamically via JS.
+window.addEventListener('load', function () {
+  setTimeout(fixMobileViewport, 300);
+});
+</script>
+<!-- ===== PHASE 9.5 MOBILE FIX END ===== -->
 
 </body>
 </html>
